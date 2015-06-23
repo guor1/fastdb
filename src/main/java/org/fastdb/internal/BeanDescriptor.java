@@ -3,8 +3,10 @@ package org.fastdb.internal;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -29,6 +31,18 @@ public class BeanDescriptor<T> {
 	 * 实体bean包含的属性，包括继承自父类的
 	 */
 	private List<BeanProperty> properties = new LinkedList<BeanProperty>();
+
+	/**
+	 * property --> BeanProperty
+	 */
+	private Map<String, BeanProperty> propertyMap = new HashMap<String, BeanProperty>();
+
+	/**
+	 * column --> BeanProperty
+	 */
+	private Map<String, BeanProperty> columnMap = new HashMap<String, BeanProperty>();
+	
+	
 
 	private BeanProperty idProperty;
 
@@ -66,6 +80,9 @@ public class BeanDescriptor<T> {
 					BeanProperty beanProperty = new BeanProperty(field, ReflectionUtils.findGetter(field, declaredMethods),
 							ReflectionUtils.findSetter(field, declaredMethods));
 					this.properties.add(beanProperty);
+					this.propertyMap.put(beanProperty.getName(), beanProperty);
+					this.columnMap.put(beanProperty.getDbColumn(), beanProperty);
+
 					if (beanProperty.isId()) {
 						this.idProperty = beanProperty;
 					}
@@ -156,8 +173,8 @@ public class BeanDescriptor<T> {
 		return properties;
 	}
 
-	public BeanProperty getBeanProperty(String propName) {
-		return null;
+	public BeanProperty getBeanProperty(String columnName) {
+		return columnMap.get(columnName);
 	}
 
 	public Object getValue(Object bean, String property) {

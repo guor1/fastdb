@@ -1,15 +1,12 @@
 package org.fastdb;
 
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.fastdb.internal.BeanDescriptor;
-import org.fastdb.internal.BeanProperty;
 import org.fastdb.util.DBUtils;
 
 public class DBServer {
@@ -26,6 +23,13 @@ public class DBServer {
 		return dataSource;
 	}
 
+	/**
+	 * 根据主键，查找对象
+	 * 
+	 * @param entityClass
+	 * @param primaryKey
+	 * @return
+	 */
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
 		BeanDescriptor<T> beanDescriptor = dbConfig.getBeanDescriptor(entityClass);
 		try {
@@ -51,21 +55,14 @@ public class DBServer {
 		}
 	}
 
-	public <T> void persist(Object entity) {
+	public <T> void persist(T entity) {
 		BeanDescriptor<?> beanDescriptor = dbConfig.getBeanDescriptor(entity.getClass());
 		try {
 			Connection conn = dataSource.getConnection();
 			try {
 				PreparedStatement pstmt = conn.prepareStatement(beanDescriptor.getInsertSql());
 				try {
-					int p = 1;
-					List<BeanProperty> properties = beanDescriptor.getProperties();
-					for (BeanProperty property : properties) {
-						Method readMethod = property.getReadMethod();
-						Object o = readMethod.invoke(entity);
-						pstmt.setObject(p++, o);
-					}
-					pstmt.executeUpdate();
+					// TODO persist
 				} finally {
 					pstmt.close();
 				}
