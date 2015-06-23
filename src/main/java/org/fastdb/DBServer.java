@@ -104,7 +104,7 @@ public class DBServer {
 			try {
 				PreparedStatement pstmt = conn.prepareStatement(beanDescriptor.getDeleteByIdSql());
 				try {
-					pstmt.setObject(1, entity);// TODO get id
+					pstmt.setObject(1, beanDescriptor.getIdValue(entity));
 					pstmt.executeUpdate();
 				} finally {
 					pstmt.close();

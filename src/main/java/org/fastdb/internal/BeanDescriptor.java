@@ -156,6 +156,18 @@ public class BeanDescriptor<T> {
 		return properties;
 	}
 
+	public BeanProperty getBeanProperty(String propName) {
+		return null;
+	}
+
+	public Object getValue(Object bean, String property) {
+		return getBeanProperty(property).getValue(bean);
+	}
+
+	public Object getIdValue(Object bean) {
+		return idProperty.getValue(bean);
+	}
+
 	public String getUpdateSql() {
 		return null;
 	}
