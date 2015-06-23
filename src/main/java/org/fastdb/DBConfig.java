@@ -3,20 +3,20 @@ package org.fastdb;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fastdb.internal.BeanDescriptor;
+
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-public class Configuration {
+public class DBConfig {
 
 	private Map<String, ComboPooledDataSource> dataSources = new HashMap<String, ComboPooledDataSource>();
+
+	private Map<String, BeanDescriptor<?>> beanMap = new HashMap<String, BeanDescriptor<?>>();
 
 	private String primaryDataSourceName;
 
 	public void configure() {
 		SysProperties.getProperty("datasource.default");
-	}
-
-	public Map<String, ComboPooledDataSource> getDataSources() {
-		return dataSources;
 	}
 
 	public ComboPooledDataSource getDataSource(String dataSourceName) {
@@ -29,5 +29,10 @@ public class Configuration {
 
 	public void setPrimaryDataSourceName(String primaryDataSourceName) {
 		this.primaryDataSourceName = primaryDataSourceName;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> klass) {
+		return (BeanDescriptor<T>) beanMap.get(klass.getName());
 	}
 }
