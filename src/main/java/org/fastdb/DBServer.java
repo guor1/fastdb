@@ -39,7 +39,9 @@ public class DBServer {
 					pstmt.setObject(1, primaryKey);
 					ResultSet rs = pstmt.executeQuery();
 					try {
-						return DBUtils.buildResult(beanDescriptor, rs);
+						if (rs.next()) {
+							return DBUtils.buildResult(beanDescriptor, rs);
+						}
 					} finally {
 						rs.close();
 					}
@@ -52,6 +54,7 @@ public class DBServer {
 		} catch (Exception e) {
 			throw new FastdbException(e);
 		}
+		return null;
 	}
 
 	public <T> void persist(T entity) {
