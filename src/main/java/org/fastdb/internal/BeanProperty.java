@@ -117,7 +117,10 @@ public class BeanProperty {
 	 */
 	private boolean isTransient = true;
 
-	public BeanProperty(Field field, Method readMethod, Method writeMethod) {
+	private final BeanDescriptor<?> beanDescriptor;
+
+	public BeanProperty(BeanDescriptor<?> beanDescriptor, Field field) {
+		this.beanDescriptor = beanDescriptor;
 		this.propertyType = field.getType();
 		this.name = field.getName();
 
@@ -141,8 +144,6 @@ public class BeanProperty {
 		if (!column && (this.id || this.version)) {
 			this.dbColumn = this.name;
 		}
-		this.readMethod = readMethod;
-		this.writeMethod = writeMethod;
 	}
 
 	public boolean isAssignableFrom(Class<?> type) {
@@ -155,6 +156,18 @@ public class BeanProperty {
 		} else {
 			selectChain.add(prefix + "." + name);
 		}
+	}
+
+	public BeanDescriptor<?> getBeanDescriptor() {
+		return beanDescriptor;
+	}
+
+	public void setReadMethod(Method readMethod) {
+		this.readMethod = readMethod;
+	}
+
+	public void setWriteMethod(Method writeMethod) {
+		this.writeMethod = writeMethod;
 	}
 
 	/**

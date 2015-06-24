@@ -41,8 +41,6 @@ public class BeanDescriptor<T> {
 	 * column --> BeanProperty
 	 */
 	private Map<String, BeanProperty> columnMap = new HashMap<String, BeanProperty>();
-	
-	
 
 	private BeanProperty idProperty;
 
@@ -77,8 +75,10 @@ public class BeanDescriptor<T> {
 			for (int i = 0; i < fields.length; i++) {
 				Field field = fields[i];
 				if (!Modifier.isStatic(field.getModifiers())) {
-					BeanProperty beanProperty = new BeanProperty(field, ReflectionUtils.findGetter(field, declaredMethods),
-							ReflectionUtils.findSetter(field, declaredMethods));
+					BeanProperty beanProperty = new BeanProperty(this, field);
+					beanProperty.setReadMethod(ReflectionUtils.findGetter(field, declaredMethods));
+					beanProperty.setWriteMethod(ReflectionUtils.findSetter(field, declaredMethods));
+
 					this.properties.add(beanProperty);
 					this.propertyMap.put(beanProperty.getName(), beanProperty);
 					this.columnMap.put(beanProperty.getDbColumn(), beanProperty);
