@@ -114,6 +114,10 @@ public class BeanDescriptor<T> {
 		}
 	}
 
+	/**
+	 * find entity by id sql.
+	 * @return
+	 */
 	private String buildFindByIdSql() {
 		if (this.idProperty == null) {
 			LOGGER.warn("compile sql fail for there is no ID property.");
