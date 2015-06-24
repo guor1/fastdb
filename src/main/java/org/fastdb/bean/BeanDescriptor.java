@@ -13,8 +13,12 @@ import javax.persistence.Table;
 
 import org.fastdb.FastdbException;
 import org.fastdb.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BeanDescriptor<T> {
+
+	private static Logger LOGGER = LoggerFactory.getLogger(BeanDescriptor.class);
 	/**
 	 * 实体类名
 	 */
@@ -91,7 +95,7 @@ public class BeanDescriptor<T> {
 
 					this.properties.add(beanProperty);
 					this.propertyMap.put(beanProperty.getName(), beanProperty);
-					this.columnMap.put(beanProperty.getDbColumn(), beanProperty);
+					this.columnMap.put(beanProperty.getDbColumn().toUpperCase(), beanProperty);
 
 					if (beanProperty.isId()) {
 						this.idProperty = beanProperty;
@@ -112,7 +116,8 @@ public class BeanDescriptor<T> {
 
 	private String buildFindByIdSql() {
 		if (this.idProperty == null) {
-			throw new FastdbException("没有找到ID属性，无法编译SQL.");
+			LOGGER.warn("compile sql fail for there is no ID property.");
+			return null;
 		}
 		StringBuilder buf = new StringBuilder(" select * from ");
 		buf.append(this.getTableName()).append(" where ");
@@ -122,7 +127,8 @@ public class BeanDescriptor<T> {
 
 	private String buildDeleteByIdSql() {
 		if (this.idProperty == null) {
-			throw new FastdbException("没有找到ID属性，无法编译SQL.");
+			LOGGER.warn("compile sql fail for there is no ID property.");
+			return null;
 		}
 		StringBuilder buf = new StringBuilder(" delete from ");
 		buf.append(this.getTableName()).append(" where ");
@@ -136,7 +142,7 @@ public class BeanDescriptor<T> {
 		buf.append(this.getTableName()).append(" (");
 		int count = 0;
 		for (BeanProperty property : properties) {
-			if (property.isId()) {
+			if (property.isId() || property.isOneAssoc()) {
 				continue;
 			}
 			if (count++ > 0) {
@@ -187,7 +193,7 @@ public class BeanDescriptor<T> {
 	}
 
 	public BeanProperty getBeanProperty(String columnName) {
-		return columnMap.get(columnName);
+		return columnMap.get(columnName.toUpperCase());
 	}
 
 	public Object getValue(Object bean, String property) {

@@ -8,7 +8,9 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.Version;
@@ -132,7 +134,7 @@ public class BeanProperty {
 	 * 
 	 * @ManyToMany and @OneToMany
 	 */
-	// private boolean oneAssoc = false;
+	private boolean oneAssoc = false;
 
 	private final BeanDescriptor<?> beanDescriptor;
 
@@ -141,7 +143,7 @@ public class BeanProperty {
 		this.propertyType = field.getType();
 		this.name = field.getName();
 
-		this.id = ReflectionUtils.annotationed(field, Id.class);
+		this.id = ReflectionUtils.annotationed(field, Id.class) || this.name.equals("id");
 		this.version = ReflectionUtils.annotationed(field, Version.class);
 		this.isTransient = !ReflectionUtils.annotationed(field, Transient.class);
 
@@ -158,16 +160,10 @@ public class BeanProperty {
 			this.dbScale = dbcolumn.scale();
 		}
 
-		if (!column && (this.id || this.version)) {
-			this.dbColumn = this.name;
-		}
-
 		this.manyAssoc = (ReflectionUtils.annotationed(field, ManyToOne.class) || ReflectionUtils.annotationed(field, OneToOne.class));
 		if (this.manyAssoc) {
 			boolean j = ReflectionUtils.annotationed(field, JoinColumn.class);
-			if (!j) {
-				this.dbColumn = this.name;
-			} else {
+			if (j) {
 				JoinColumn joinColumn = ReflectionUtils.getAnnotation(field, JoinColumn.class);
 				this.nullable = joinColumn.nullable();
 				this.unique = joinColumn.unique();
@@ -176,6 +172,10 @@ public class BeanProperty {
 				this.dbInsertable = joinColumn.insertable();
 				this.dbUpdatable = joinColumn.updatable();
 			}
+		}
+		this.oneAssoc = (ReflectionUtils.annotationed(field, ManyToMany.class) || ReflectionUtils.annotationed(field, OneToMany.class));
+		if (this.dbColumn == null || this.dbColumn.isEmpty()) {
+			this.dbColumn = this.name;
 		}
 	}
 
@@ -193,6 +193,10 @@ public class BeanProperty {
 
 	public boolean isManyAssoc() {
 		return this.manyAssoc;
+	}
+
+	public boolean isOneAssoc() {
+		return oneAssoc;
 	}
 
 	public BeanDescriptor<?> getBeanDescriptor() {

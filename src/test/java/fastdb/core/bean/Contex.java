@@ -3,12 +3,21 @@ package fastdb.core.bean;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
 /**
  * wdyq_contex
  * 
  * @author guor
  * 
  */
+@Entity
+@Table(name = "wdyq_contex")
 public class Contex implements Serializable {
 
 	/**
@@ -16,19 +25,26 @@ public class Contex implements Serializable {
 	 */
 	private static final long serialVersionUID = -7980715878136339361L;
 
+	@Id
+	@GeneratedValue
 	private long id;
 
+	@Column(name = "host", nullable = false, length = 100)
 	private String host;
 
+	@Column(name = "doctype", nullable = true, length = 10)
 	private String doctype;
 
+	@Column(name = "template", nullable = false, unique = true, length = 255)
 	private String template;
 
 	/**
 	 * i:content c:page content t:article r:<div>(.*)</div>
 	 */
+	@Column(name = "expression", nullable = false, length = 255)
 	private String expression;
 
+	@Version
 	private Timestamp lastoptime;
 
 	public long getId() {

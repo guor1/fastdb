@@ -49,6 +49,17 @@ public class DBUtils {
 		return instance;
 	}
 
+	public static <T> List<T> buildResult(BeanDescriptor<T> beanDescriptor, List<DBRow> dbRows) throws Exception {
+		List<T> result = new LinkedList<T>();
+		if (dbRows == null || dbRows.isEmpty()) {
+			return result;
+		}
+		for (DBRow row : dbRows) {
+			result.add(buildResult(beanDescriptor, row));
+		}
+		return result;
+	}
+
 	public static <T> T buildResult(BeanDescriptor<T> beanDescriptor, DBRow dbRow) throws Exception {
 		if (dbRow == null) {
 			return null;

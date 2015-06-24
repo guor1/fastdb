@@ -6,6 +6,10 @@ public class DB {
 
 	private static DBServer dbServer;
 
+	public void persist(Object entity) {
+		dbServer.persist(entity);
+	}
+
 	public static void delete(Object entity) {
 		dbServer.delete(entity);
 	}
