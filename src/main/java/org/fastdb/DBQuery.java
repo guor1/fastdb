@@ -8,6 +8,10 @@ public interface DBQuery {
 	DBRow getSingleResult();
 
 	int executeUpdate();
+	
+	boolean execute();
 
 	DBQuery setParameter(int position, Object value);
+
+	DBQuery setParameter(int position, Object value, int sqlType);
 }

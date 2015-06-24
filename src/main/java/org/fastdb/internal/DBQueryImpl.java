@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +22,7 @@ public class DBQueryImpl implements DBQuery {
 
 	private final String sql;
 
-	private Map<Integer, Object> indexParams = new HashMap<Integer, Object>();
+	private Map<Integer, TypedValue> indexParams = new HashMap<Integer, TypedValue>();
 
 	public DBQueryImpl(DBServer dbServer, String sql) {
 		this.dbServer = dbServer;
@@ -56,7 +57,8 @@ public class DBQueryImpl implements DBQuery {
 		Iterator<Integer> iterator = indexParams.keySet().iterator();
 		while (iterator.hasNext()) {
 			Integer index = iterator.next();
-			pstmt.setObject(index, indexParams.get(index));
+			TypedValue typedValue = indexParams.get(index);
+			DBUtils.setParameterValue(pstmt, index, typedValue.getSqlType(), typedValue.getValue());
 		}
 	}
 
@@ -87,8 +89,33 @@ public class DBQueryImpl implements DBQuery {
 		}
 	}
 
+	@Override
+	public boolean execute() {
+		try {
+			Connection conn = this.dbServer.getConnection();
+			try {
+				PreparedStatement pstmt = conn.prepareStatement(this.sql);
+				try {
+					doPrepare(pstmt);
+					return pstmt.execute();
+				} finally {
+					pstmt.close();
+				}
+			} finally {
+				conn.close();
+			}
+		} catch (Exception e) {
+			throw new FastdbException(e);
+		}
+	}
+
 	public DBQueryImpl setParameter(int position, Object value) {
-		indexParams.put(position, value);
+		indexParams.put(position, new TypedValue(Types.OTHER, value));
+		return this;
+	}
+
+	public DBQueryImpl setParameter(int position, Object value, int sqlType) {
+		indexParams.put(position, new TypedValue(sqlType, value));
 		return this;
 	}
 

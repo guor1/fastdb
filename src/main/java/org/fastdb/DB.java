@@ -6,16 +6,8 @@ public class DB {
 
 	private static DBServer dbServer;
 
-	public static <T> void persist(T entity) {
-		dbServer.persist(entity);
-	}
-
-	public static <T> T merge(T entity) {
-		return dbServer.merge(entity);
-	}
-
-	public static <T> void remove(T entity) {
-		dbServer.remove(entity);
+	public static void delete(Object entity) {
+		dbServer.delete(entity);
 	}
 
 	public static <T> T find(Class<T> entityClass, Object primaryKey) {

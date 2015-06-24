@@ -11,7 +11,7 @@ public class DBConfig {
 
 	private Map<String, ComboPooledDataSource> dataSources = new HashMap<String, ComboPooledDataSource>();
 
-	private Map<String, BeanDescriptor<?>> beanMap = new HashMap<String, BeanDescriptor<?>>();
+	private static Map<String, BeanDescriptor<?>> beanMap = new HashMap<String, BeanDescriptor<?>>();
 
 	private String primaryDataSourceName;
 
@@ -31,8 +31,28 @@ public class DBConfig {
 		this.primaryDataSourceName = primaryDataSourceName;
 	}
 
+	public static <T> BeanDescriptor<T> getBeanDescriptor(Class<T> klass) {
+		return getBeanDescriptor(klass, true);
+	}
+
 	@SuppressWarnings("unchecked")
-	public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> klass) {
-		return (BeanDescriptor<T>) beanMap.get(klass.getName());
+	public static <T> BeanDescriptor<T> getBeanDescriptor(Class<T> klass, boolean throwIfNotExists) {
+		BeanDescriptor<T> beanDescriptor = (BeanDescriptor<T>) beanMap.get(klass.getName());
+		if (beanDescriptor == null && throwIfNotExists) {
+			throw new FastdbException("No BeanDescriptor assosiated with " + klass.getName());
+		}
+		return beanDescriptor;
+	}
+
+	public static <T> BeanDescriptor<T> getBeanDescriptorWithCreate(Class<T> klass) {
+		BeanDescriptor<T> beanDescriptor = getBeanDescriptor(klass, false);
+		if (beanDescriptor != null) {
+			return beanDescriptor;
+		}
+		synchronized (DBConfig.class) {
+			beanDescriptor = new BeanDescriptor<T>(klass);
+			beanMap.put(klass.getName(), beanDescriptor);
+		}
+		return beanDescriptor;
 	}
 }

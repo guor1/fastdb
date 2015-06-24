@@ -28,9 +28,19 @@ public class BeanDescriptor<T> {
 	private final String tableAlias;
 
 	/**
-	 * 实体bean包含的属性，包括继承自父类的
+	 * 实体bean包含的属性，包括继承自父类的，全部属性
 	 */
 	private List<BeanProperty> properties = new LinkedList<BeanProperty>();
+
+	/**
+	 * 
+	 */
+	private List<BeanProperty> propertiesMany = new LinkedList<BeanProperty>();
+
+	/**
+	 * 
+	 */
+	private List<BeanProperty> propertiesOne = new LinkedList<BeanProperty>();
 
 	/**
 	 * property --> BeanProperty
@@ -100,11 +110,6 @@ public class BeanDescriptor<T> {
 		}
 	}
 
-	/**
-	 * 编译根据ID查找记录SQL
-	 * 
-	 * @return
-	 */
 	private String buildFindByIdSql() {
 		if (this.idProperty == null) {
 			throw new FastdbException("没有找到ID属性，无法编译SQL.");
@@ -173,12 +178,24 @@ public class BeanDescriptor<T> {
 		return properties;
 	}
 
+	public List<BeanProperty> getPropertiesMany() {
+		return propertiesMany;
+	}
+
+	public List<BeanProperty> getPropertiesOne() {
+		return propertiesOne;
+	}
+
 	public BeanProperty getBeanProperty(String columnName) {
 		return columnMap.get(columnName);
 	}
 
 	public Object getValue(Object bean, String property) {
 		return getBeanProperty(property).getValue(bean);
+	}
+
+	public BeanProperty getIdProperty() {
+		return idProperty;
 	}
 
 	public Object getIdValue(Object bean) {

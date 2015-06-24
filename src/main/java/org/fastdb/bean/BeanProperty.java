@@ -7,6 +7,9 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
@@ -117,6 +120,20 @@ public class BeanProperty {
 	 */
 	private boolean isTransient = true;
 
+	/**
+	 * the many side of a relation
+	 * 
+	 * @ManyToOne and @OneToOne
+	 */
+	private boolean manyAssoc = false;
+
+	/**
+	 * the one side of a relation
+	 * 
+	 * @ManyToMany and @OneToMany
+	 */
+	// private boolean oneAssoc = false;
+
 	private final BeanDescriptor<?> beanDescriptor;
 
 	public BeanProperty(BeanDescriptor<?> beanDescriptor, Field field) {
@@ -144,6 +161,22 @@ public class BeanProperty {
 		if (!column && (this.id || this.version)) {
 			this.dbColumn = this.name;
 		}
+
+		this.manyAssoc = (ReflectionUtils.annotationed(field, ManyToOne.class) || ReflectionUtils.annotationed(field, OneToOne.class));
+		if (this.manyAssoc) {
+			boolean j = ReflectionUtils.annotationed(field, JoinColumn.class);
+			if (!j) {
+				this.dbColumn = this.name;
+			} else {
+				JoinColumn joinColumn = ReflectionUtils.getAnnotation(field, JoinColumn.class);
+				this.nullable = joinColumn.nullable();
+				this.unique = joinColumn.unique();
+				this.dbColumn = joinColumn.name();
+				this.dbColumnDefn = joinColumn.columnDefinition();
+				this.dbInsertable = joinColumn.insertable();
+				this.dbUpdatable = joinColumn.updatable();
+			}
+		}
 	}
 
 	public boolean isAssignableFrom(Class<?> type) {
@@ -156,6 +189,10 @@ public class BeanProperty {
 		} else {
 			selectChain.add(prefix + "." + name);
 		}
+	}
+
+	public boolean isManyAssoc() {
+		return this.manyAssoc;
 	}
 
 	public BeanDescriptor<?> getBeanDescriptor() {
