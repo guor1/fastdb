@@ -26,12 +26,14 @@ public class DB {
 		return null;
 	}
 
-	public static Query createNamedQuery(String name) {
-		return null;
-	}
-
-	public static Query createNativeQuery(String sqlString) {
-		return null;
+	/**
+	 * create a query based on a manual sql
+	 * 
+	 * @param sql sql to be executed
+	 * @return
+	 */
+	public static DBQuery createNativeQuery(String sqlString) {
+		return dbServer.createNativeQuery(sqlString);
 	}
 
 	public static <T> Query createNativeQuery(String sqlString, Class<T> resultClass) {

@@ -1,4 +1,4 @@
-package org.fastdb.internal;
+package org.fastdb.bean;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

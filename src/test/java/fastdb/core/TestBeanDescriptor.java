@@ -1,6 +1,6 @@
 package fastdb.core;
 
-import org.fastdb.internal.BeanDescriptor;
+import org.fastdb.bean.BeanDescriptor;
 import org.junit.Test;
 
 public class TestBeanDescriptor {

@@ -3,7 +3,7 @@ package org.fastdb;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.fastdb.internal.BeanDescriptor;
+import org.fastdb.bean.BeanDescriptor;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
