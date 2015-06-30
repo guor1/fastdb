@@ -89,26 +89,6 @@ public class DBQueryImpl implements DBQuery {
 		}
 	}
 
-	@Override
-	public boolean execute() {
-		try {
-			Connection conn = this.dbServer.getConnection();
-			try {
-				PreparedStatement pstmt = conn.prepareStatement(this.sql);
-				try {
-					doPrepare(pstmt);
-					return pstmt.execute();
-				} finally {
-					pstmt.close();
-				}
-			} finally {
-				conn.close();
-			}
-		} catch (Exception e) {
-			throw new FastdbException(e);
-		}
-	}
-
 	public DBQueryImpl setParameter(int position, Object value) {
 		indexParams.put(position, new TypedValue(Types.OTHER, value));
 		return this;

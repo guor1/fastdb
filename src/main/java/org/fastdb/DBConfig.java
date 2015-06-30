@@ -9,6 +9,10 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class DBConfig {
 
+	static {
+		
+	}
+
 	private Map<String, ComboPooledDataSource> dataSources = new HashMap<String, ComboPooledDataSource>();
 
 	private static Map<String, BeanDescriptor<?>> beanMap = new HashMap<String, BeanDescriptor<?>>();
