@@ -12,6 +12,10 @@ public class SysProperties {
 	private static String defaultConfigName = "fastdb.properties";
 
 	private static void initPropertyMap() {
+		String fileName = System.getProperty("fastdb.props");
+		if (fileName == null || fileName.isEmpty()) {
+			fileName = defaultConfigName;
+		}
 		props = PropertiesUtils.load(defaultConfigName);
 		if (props == null) {
 			props = new Properties();

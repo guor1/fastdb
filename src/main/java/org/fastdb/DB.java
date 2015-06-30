@@ -6,7 +6,7 @@ import javax.persistence.PersistenceException;
 
 public class DB {
 
-	private static DBServer dbServer;
+	private static DBServer dbServer = DBConfig.getPrimaryDBServer();
 
 	/**
 	 * Persist an entity.
