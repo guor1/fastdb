@@ -35,12 +35,13 @@ public class DBConfig {
 		dataSource.setJdbcUrl(SysProperties.getProperty(getServerProperty("jdbcUrl")));
 		dataSource.setUser(SysProperties.getProperty(getServerProperty("user")));
 		dataSource.setPassword(SysProperties.getProperty(getServerProperty("password")));
-		dataSource.setCheckoutTimeout(SysProperties.getInt(getServerProperty("checkoutTimeout"), 5000));
+		dataSource.setCheckoutTimeout(SysProperties.getInt(getServerProperty("checkoutTimeout"), 50));
 		dataSource.setMaxPoolSize(SysProperties.getInt(getServerProperty("maxPoolSize"), 10));
 		dataSource.setInitialPoolSize(SysProperties.getInt(getServerProperty("initialPoolSize"), 1));
 		dataSource.setMinPoolSize(SysProperties.getInt(getServerProperty("initialPoolSize"), 3));
-		dataSource.setMaxIdleTime(SysProperties.getInt(getServerProperty("maxIdleTime"), 5000));
+		dataSource.setMaxIdleTime(SysProperties.getInt(getServerProperty("maxIdleTime"), 30));
 		dataSource.setAcquireIncrement(SysProperties.getInt(getServerProperty("acquireIncrement"), 1));
+		dataSource.setIdleConnectionTestPeriod(30);
 		dataSource.setTestConnectionOnCheckin(true);
 		servers.put(primaryServerName, new DBServer(dataSource));
 	}
