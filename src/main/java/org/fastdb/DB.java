@@ -1,9 +1,16 @@
 package org.fastdb;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+/**
+ * Provide static methods that proxy for the <em>'default'</em> DBServer.
+ * 
+ * @author guor
+ *
+ */
 public class DB {
 
 	/**
@@ -37,6 +44,10 @@ public class DB {
 	 */
 	public static void delete(Object entity) {
 		DBConfig.getPrimaryDBServer().delete(entity);
+	}
+
+	public static <T> List<T> findList(Class<T> entityClass) {
+		return DBConfig.getPrimaryDBServer().findList(entityClass);
 	}
 
 	/**

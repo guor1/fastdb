@@ -55,7 +55,7 @@ public class DBServer {
 
 	public <T> List<T> findList(Class<T> entityClass) {
 		BeanDescriptor<T> beanDescriptor = DBConfig.getBeanDescriptor(entityClass);
-		try {// TODO query dsl
+		try {
 			return DBUtils.buildResult(beanDescriptor, createNativeQuery("select * from " + beanDescriptor.getTableName()).getResultList());
 		} catch (Exception e) {
 			throw new FastdbException(e);
@@ -96,7 +96,8 @@ public class DBServer {
 	/**
 	 * create a query based on a manual sql
 	 * 
-	 * @param sql sql to be executed
+	 * @param sql
+	 *            sql to be executed
 	 * @return
 	 */
 	public DBQuery createNativeQuery(String sqlString) {

@@ -2,12 +2,21 @@ package org.fastdb;
 
 import java.sql.Connection;
 
-import javax.persistence.RollbackException;
-
 public interface Transaction {
-	public void commit() throws RollbackException;
+	/**
+	 * Commit the current transaction
+	 */
+	public void commit();
 
-	public void rollback() throws RollbackException;
-	
+	/**
+	 * Roll back the current transaction
+	 */
+	public void rollback();
+
+	/**
+	 * get the connection on the current transaction
+	 * 
+	 * @return
+	 */
 	Connection getConnection();
 }

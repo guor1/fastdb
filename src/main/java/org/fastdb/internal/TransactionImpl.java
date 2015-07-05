@@ -21,7 +21,7 @@ public class TransactionImpl implements Transaction {
 	}
 
 	@Override
-	public void commit() throws RollbackException {
+	public void commit() {
 		try {
 			connection.commit();
 		} catch (SQLException e) {
@@ -30,7 +30,7 @@ public class TransactionImpl implements Transaction {
 	}
 
 	@Override
-	public void rollback() throws RollbackException {
+	public void rollback() {
 		try {
 			connection.rollback();
 		} catch (SQLException e) {
