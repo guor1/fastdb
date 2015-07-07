@@ -37,16 +37,6 @@ public class BeanDescriptor<T> {
 	private List<BeanProperty> properties = new LinkedList<BeanProperty>();
 
 	/**
-	 * 
-	 */
-	private List<BeanProperty> propertiesMany = new LinkedList<BeanProperty>();
-
-	/**
-	 * 
-	 */
-	private List<BeanProperty> propertiesOne = new LinkedList<BeanProperty>();
-
-	/**
 	 * property --> BeanProperty
 	 */
 	private Map<String, BeanProperty> propertyMap = new HashMap<String, BeanProperty>();
@@ -94,6 +84,7 @@ public class BeanDescriptor<T> {
 					beanProperty.setWriteMethod(ReflectionUtils.findSetter(field, declaredMethods));
 
 					this.properties.add(beanProperty);
+
 					this.propertyMap.put(beanProperty.getName(), beanProperty);
 					this.columnMap.put(beanProperty.getDbColumn().toUpperCase(), beanProperty);
 
@@ -116,6 +107,7 @@ public class BeanDescriptor<T> {
 
 	/**
 	 * find entity by id sql.
+	 * 
 	 * @return
 	 */
 	private String buildFindByIdSql() {
@@ -188,14 +180,6 @@ public class BeanDescriptor<T> {
 		return properties;
 	}
 
-	public List<BeanProperty> getPropertiesMany() {
-		return propertiesMany;
-	}
-
-	public List<BeanProperty> getPropertiesOne() {
-		return propertiesOne;
-	}
-
 	public BeanProperty getBeanProperty(String columnName) {
 		return columnMap.get(columnName.toUpperCase());
 	}
@@ -218,6 +202,6 @@ public class BeanDescriptor<T> {
 
 	@Override
 	public String toString() {
-		return "BeanDescriptor [beanType=" + beanType + ", tableName=" + tableName + ", tableAlias=" + tableAlias + "]";
+		return "BeanDescriptor [beanType=" + getBeanType() + ", tableName=" + getTableName() + ", tableAlias=" + getTableAlias() + "]";
 	}
 }
