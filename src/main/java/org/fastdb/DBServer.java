@@ -41,11 +41,11 @@ public class DBServer {
 
 	public void persist(Object entity) {
 		BeanDescriptor<?> beanDescriptor = DBConfig.getBeanDescriptor(entity.getClass());
-		DBQuery dbQuery = createNativeQuery(beanDescriptor.getInsertSql());
+		DBQuery dbQuery = createNativeQuery(beanDescriptor.buildInsertSql());
 		int p = 1;
 		List<BeanProperty> properties = beanDescriptor.getProperties();
 		for (BeanProperty property : properties) {
-			if (property.isId() || property.isOneAssoc()) {
+			if (property.isId() || !property.isDbInsertable() || property.isManyAssoc()) {
 				continue;
 			}
 			dbQuery.setParameter(p++, property.getValue(entity));
@@ -72,7 +72,7 @@ public class DBServer {
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
 		BeanDescriptor<T> beanDescriptor = DBConfig.getBeanDescriptor(entityClass);
 		try {
-			return DBUtils.buildResult(beanDescriptor, createNativeQuery(beanDescriptor.getFindByIdSql()).setParameter(1, primaryKey)
+			return DBUtils.buildResult(beanDescriptor, createNativeQuery(beanDescriptor.buildFindByIdSql()).setParameter(1, primaryKey)
 					.getSingleResult());
 		} catch (Exception e) {
 			throw new FastdbException(e);
@@ -81,7 +81,7 @@ public class DBServer {
 
 	public <T> int delete(Class<T> beanType, Object primaryKey) {
 		BeanDescriptor<T> beanDescriptor = DBConfig.getBeanDescriptor(beanType);
-		return createNativeQuery(beanDescriptor.getDeleteByIdSql()).setParameter(1, primaryKey).executeUpdate();
+		return createNativeQuery(beanDescriptor.buildDeleteByIdSql()).setParameter(1, primaryKey).executeUpdate();
 	}
 
 	/**

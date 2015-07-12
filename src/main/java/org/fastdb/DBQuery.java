@@ -71,4 +71,15 @@ public interface DBQuery {
 	 *             a parameter of the query
 	 */
 	DBQuery setParameter(int position, Object value, int sqlType);
+	
+	/**
+	 * Query using a prepared statement, mapping each row to a Java object via a RowMapper.
+	 * <p>
+	 * This will be helpful when we want to fetch objects that not simplely mapped to a table.
+	 * 
+	 * @param psc object that can create a PreparedStatement given a Connection
+	 * @param rowMapper object that will map one object per row
+	 * @return
+	 */
+	<T> List<T> executeQuery(PreparedStatementSetter psc, RowMapper<T> rowMapper);
 }

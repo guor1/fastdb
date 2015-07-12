@@ -15,6 +15,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.fastdb.DBConfig;
+import org.fastdb.FastdbException;
 import org.fastdb.util.ReflectionUtils;
 
 /**
@@ -125,16 +127,18 @@ public class BeanProperty {
 	/**
 	 * the many side of a relation
 	 * 
-	 * @ManyToOne and @OneToOne
+	 * @ManyToMany and @OneToMany
 	 */
 	private boolean manyAssoc = false;
 
 	/**
 	 * the one side of a relation
 	 * 
-	 * @ManyToMany and @OneToMany
+	 * @ManyToOne and @OneToOne
 	 */
 	private boolean oneAssoc = false;
+
+	private String referencedColumnName;
 
 	private final BeanDescriptor<?> beanDescriptor;
 
@@ -160,23 +164,42 @@ public class BeanProperty {
 			this.dbScale = dbcolumn.scale();
 		}
 
-		this.manyAssoc = (ReflectionUtils.annotationed(field, ManyToOne.class) || ReflectionUtils.annotationed(field, OneToOne.class));
-		if (this.manyAssoc) {
+		this.oneAssoc = (ReflectionUtils.annotationed(field, ManyToOne.class) || ReflectionUtils.annotationed(field, OneToOne.class));
+		if (this.oneAssoc) {
 			boolean j = ReflectionUtils.annotationed(field, JoinColumn.class);
 			if (j) {
 				JoinColumn joinColumn = ReflectionUtils.getAnnotation(field, JoinColumn.class);
+				String referencedColumnName = joinColumn.referencedColumnName();
+				if (referencedColumnName == null || referencedColumnName.isEmpty()) {
+					referencedColumnName = getDefaultReferencedColumnName(this.propertyType);
+				}
+				this.referencedColumnName = referencedColumnName;
 				this.nullable = joinColumn.nullable();
 				this.unique = joinColumn.unique();
 				this.dbColumn = joinColumn.name();
 				this.dbColumnDefn = joinColumn.columnDefinition();
 				this.dbInsertable = joinColumn.insertable();
 				this.dbUpdatable = joinColumn.updatable();
+			} else {
+				this.referencedColumnName = getDefaultReferencedColumnName(this.propertyType);
 			}
 		}
-		this.oneAssoc = (ReflectionUtils.annotationed(field, ManyToMany.class) || ReflectionUtils.annotationed(field, OneToMany.class));
+		this.manyAssoc = (ReflectionUtils.annotationed(field, ManyToMany.class) || ReflectionUtils.annotationed(field, OneToMany.class));
+		// TODO deal with manyAssoc
 		if (this.dbColumn == null || this.dbColumn.isEmpty()) {
 			this.dbColumn = this.name;
 		}
+	}
+
+	private String getDefaultReferencedColumnName(Class<?> beanType) {
+		String referencedColumnName = null;
+		BeanProperty idProperty = DBConfig.getBeanDescriptor(beanType).getIdProperty();
+		if (idProperty == null) {
+			throw new FastdbException("");
+		} else {
+			referencedColumnName = idProperty.getDbColumn();
+		}
+		return referencedColumnName;
 	}
 
 	public boolean isAssignableFrom(Class<?> type) {
@@ -197,6 +220,10 @@ public class BeanProperty {
 
 	public boolean isOneAssoc() {
 		return oneAssoc;
+	}
+
+	public String getReferencedColumnName() {
+		return referencedColumnName;
 	}
 
 	public BeanDescriptor<?> getBeanDescriptor() {
@@ -236,15 +263,33 @@ public class BeanProperty {
 
 	/**
 	 * Return the value of the property method.
+	 * 
+	 * if manyAssoc is true,
 	 */
 	public Object getValue(Object bean) {
+		Object value = null;
 		try {
-			return readMethod.invoke(bean, NO_ARGS);
+			value = readMethod.invoke(bean, NO_ARGS);
 		} catch (Exception ex) {
 			String beanType = bean == null ? "null" : bean.getClass().getName();
 			String msg = "get " + name + " on [" + getName() + "] type[" + beanType + "] threw error.";
 			throw new RuntimeException(msg, ex);
 		}
+
+		if (value == null) {
+			return null;
+		}
+		if (this.isOneAssoc()) {
+			try {
+				value = DBConfig.getBeanDescriptor(value.getClass()).getBeanProperty(getReferencedColumnName()).getReadMethod()
+						.invoke(value, NO_ARGS);
+			} catch (Exception ex) {
+				String beanType = value == null ? "null" : value.getClass().getName();
+				String msg = "get " + name + " on [" + getName() + "] type[" + beanType + "] threw error.";
+				throw new RuntimeException(msg, ex);
+			}
+		}
+		return value;
 	}
 
 	/**

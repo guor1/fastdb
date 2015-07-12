@@ -79,7 +79,7 @@ public class DBUtils {
 			/**
 			 * lazy load the many side object
 			 */
-			if (beanProperty.isManyAssoc()) {
+			if (beanProperty.isOneAssoc()) {
 				writeMethod.invoke(instance, LazyInitializer.load(beanProperty.getPropertyType(), dbRow.get(columnLabel)));
 			} else {
 				writeMethod.invoke(instance, dbRow.get(columnLabel));

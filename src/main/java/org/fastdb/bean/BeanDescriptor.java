@@ -13,12 +13,9 @@ import javax.persistence.Table;
 
 import org.fastdb.FastdbException;
 import org.fastdb.util.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BeanDescriptor<T> {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(BeanDescriptor.class);
 	/**
 	 * 实体类名
 	 */
@@ -29,17 +26,10 @@ public class BeanDescriptor<T> {
 	 */
 	private final String tableName;
 
-	private final String tableAlias;
-
 	/**
 	 * 实体bean包含的属性，包括继承自父类的，全部属性
 	 */
 	private List<BeanProperty> properties = new LinkedList<BeanProperty>();
-
-	/**
-	 * property --> BeanProperty
-	 */
-	private Map<String, BeanProperty> propertyMap = new HashMap<String, BeanProperty>();
 
 	/**
 	 * column --> BeanProperty
@@ -48,11 +38,7 @@ public class BeanDescriptor<T> {
 
 	private BeanProperty idProperty;
 
-	private String deleteByIdSql;
-
-	private String findByIdSql;
-
-	private String insertSql;
+	private SqlBuilder<T> sqlBuilder;
 
 	public BeanDescriptor(Class<T> beanType) {
 		super();
@@ -64,12 +50,8 @@ public class BeanDescriptor<T> {
 			throw new FastdbException("非实体类对象，无法提取实体信息。");
 		}
 		this.tableName = ReflectionUtils.getAnnotation(beanType, Table.class).name();
-		this.tableAlias = "t0";
 		this.buildBeanProperties(beanType);
-
-		this.findByIdSql = buildFindByIdSql();
-		this.deleteByIdSql = buildDeleteByIdSql();
-		this.insertSql = buildInsertSql();
+		this.sqlBuilder = new SqlBuilder<T>(this);
 	}
 
 	private void buildBeanProperties(Class<?> beanType) {
@@ -84,8 +66,6 @@ public class BeanDescriptor<T> {
 					beanProperty.setWriteMethod(ReflectionUtils.findSetter(field, declaredMethods));
 
 					this.properties.add(beanProperty);
-
-					this.propertyMap.put(beanProperty.getName(), beanProperty);
 					this.columnMap.put(beanProperty.getDbColumn().toUpperCase(), beanProperty);
 
 					if (beanProperty.isId()) {
@@ -105,53 +85,6 @@ public class BeanDescriptor<T> {
 		}
 	}
 
-	/**
-	 * find entity by id sql.
-	 * 
-	 * @return
-	 */
-	private String buildFindByIdSql() {
-		if (this.idProperty == null) {
-			LOGGER.warn("compile sql fail for there is no ID property.");
-			return null;
-		}
-		StringBuilder buf = new StringBuilder(" select * from ");
-		buf.append(this.getTableName()).append(" where ");
-		buf.append(idProperty.getDbColumn()).append("=?");
-		return buf.toString();
-	}
-
-	private String buildDeleteByIdSql() {
-		if (this.idProperty == null) {
-			LOGGER.warn("compile sql fail for there is no ID property.");
-			return null;
-		}
-		StringBuilder buf = new StringBuilder(" delete from ");
-		buf.append(this.getTableName()).append(" where ");
-		buf.append(idProperty.getDbColumn()).append("=?");
-		return buf.toString();
-	}
-
-	private String buildInsertSql() {
-		StringBuilder temp = new StringBuilder();
-		StringBuilder buf = new StringBuilder(" insert into ");
-		buf.append(this.getTableName()).append(" (");
-		int count = 0;
-		for (BeanProperty property : properties) {
-			if (property.isId() || property.isOneAssoc()) {
-				continue;
-			}
-			if (count++ > 0) {
-				buf.append(", ");
-				temp.append(",");
-			}
-			buf.append(property.getDbColumn());
-			temp.append("?");
-		}
-		buf.append(") values (").append(temp).append(")");
-		return buf.toString();
-	}
-
 	public Class<T> getBeanType() {
 		return beanType;
 	}
@@ -160,20 +93,16 @@ public class BeanDescriptor<T> {
 		return tableName;
 	}
 
-	public String getTableAlias() {
-		return tableAlias;
+	public String buildFindByIdSql() {
+		return sqlBuilder.buildFindByIdSql();
 	}
 
-	public String getFindByIdSql() {
-		return findByIdSql;
+	public String buildDeleteByIdSql() {
+		return sqlBuilder.buildDeleteByIdSql();
 	}
 
-	public String getDeleteByIdSql() {
-		return deleteByIdSql;
-	}
-
-	public String getInsertSql() {
-		return insertSql;
+	public String buildInsertSql() {
+		return sqlBuilder.buildInsertSql();
 	}
 
 	public List<BeanProperty> getProperties() {
@@ -202,6 +131,6 @@ public class BeanDescriptor<T> {
 
 	@Override
 	public String toString() {
-		return "BeanDescriptor [beanType=" + getBeanType() + ", tableName=" + getTableName() + ", tableAlias=" + getTableAlias() + "]";
+		return "BeanDescriptor [beanType=" + getBeanType() + ", tableName=" + getTableName() + "]";
 	}
 }

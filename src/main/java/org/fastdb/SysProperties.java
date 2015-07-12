@@ -51,4 +51,8 @@ public class SysProperties {
 	public static void put(String key, String value) {
 		getPropertyMap().setProperty(key, value);
 	}
+
+	public static boolean debugSql() {
+		return getBoolean("fastdb.debug.sql", false);
+	}
 }

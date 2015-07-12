@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,9 +15,16 @@ import org.fastdb.DBQuery;
 import org.fastdb.DBRow;
 import org.fastdb.DBServer;
 import org.fastdb.FastdbException;
+import org.fastdb.PreparedStatementSetter;
+import org.fastdb.RowMapper;
+import org.fastdb.SysProperties;
 import org.fastdb.util.DBUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DBQueryImpl implements DBQuery {
+
+	private static Logger LOGGER = LoggerFactory.getLogger(DBQueryImpl.class);
 
 	private final DBServer dbServer;
 
@@ -30,6 +38,9 @@ public class DBQueryImpl implements DBQuery {
 	}
 
 	public List<DBRow> getResultList() {
+		if (SysProperties.debugSql()) {
+			LOGGER.info(this.sql);
+		}
 		try {
 			Connection conn = this.dbServer.getConnection();
 			try {
@@ -71,6 +82,9 @@ public class DBQueryImpl implements DBQuery {
 	}
 
 	public int executeUpdate() {
+		if (SysProperties.debugSql()) {
+			LOGGER.info(this.sql);
+		}
 		try {
 			Connection conn = this.dbServer.getConnection();
 			try {
@@ -102,5 +116,37 @@ public class DBQueryImpl implements DBQuery {
 	@Override
 	public String toString() {
 		return "SqlQuery:[" + sql + "]";
+	}
+
+	@Override
+	public <T> List<T> executeQuery(PreparedStatementSetter preparedStatementSetter, RowMapper<T> rowMapper) {
+		if (SysProperties.debugSql()) {
+			LOGGER.info(this.sql);
+		}
+		List<T> result = new ArrayList<T>();
+		try {
+			Connection conn = this.dbServer.getConnection();
+			try {
+				PreparedStatement pstmt = conn.prepareStatement(this.sql);
+				try {
+					preparedStatementSetter.setValues(pstmt);
+					ResultSet rs = pstmt.executeQuery();
+					try {
+						while (rs.next()) {
+							result.add(rowMapper.mapRow(rs, rs.getRow()));
+						}
+					} finally {
+						rs.close();
+					}
+				} finally {
+					pstmt.close();
+				}
+			} finally {
+				conn.close();
+			}
+		} catch (Exception e) {
+			throw new FastdbException(e);
+		}
+		return result;
 	}
 }

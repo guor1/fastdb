@@ -33,6 +33,11 @@ public class TestDBConfig {
 		Connection conn = DB.use("h2db").getConnection();
 		conn.close();
 	}
+	
+	@Test
+	public void testDebugSql() {
+		Assert.assertEquals(true, SysProperties.debugSql());
+	}
 
 	public static String getServerProperty(String propName) {
 		return getServerProperty("h2db", propName);

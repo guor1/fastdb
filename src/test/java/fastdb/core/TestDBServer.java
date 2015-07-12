@@ -3,7 +3,6 @@ package fastdb.core;
 import java.sql.Timestamp;
 import java.util.List;
 
-import org.fastdb.DBConfig;
 import org.fastdb.DBQuery;
 import org.fastdb.DBRow;
 import org.fastdb.DBServer;
@@ -20,7 +19,6 @@ public class TestDBServer {
 	@Before
 	public void init() {
 		dbServer = new DBServer(H2Database.dataSource);
-		DBConfig.getBeanDescriptorWithCreate(Contex.class);
 		dbServer.createNativeQuery("DROP TABLE IF EXISTS `wdyq_contex`").executeUpdate();
 		String sql = "CREATE TABLE `wdyq_contex` (`id` int(10) NOT NULL AUTO_INCREMENT, `host` varchar(100) NOT NULL, `doctype` varchar(10) NULL, `template` varchar(255) NOT NULL, `expression` varchar(255) NOT NULL, `lastoptime` timestamp NULL, PRIMARY KEY (`id`), UNIQUE KEY `template_uk` (`template`) USING BTREE) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8";
 		int d = dbServer.createNativeQuery(sql).executeUpdate();
