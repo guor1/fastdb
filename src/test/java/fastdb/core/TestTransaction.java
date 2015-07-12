@@ -34,7 +34,6 @@ public class TestTransaction {
 		} catch (FastdbException e) {
 			DB.rollbackTransaction();
 		}
-		DB.commitTransaction();
 		size = DB.findList(User.class).size();
 		Assert.assertEquals(1, size);
 	}

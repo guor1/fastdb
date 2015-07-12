@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.persistence.PersistenceException;
-import javax.persistence.RollbackException;
 
 import org.fastdb.Transaction;
 
@@ -22,20 +21,32 @@ public class TransactionImpl implements Transaction {
 	}
 
 	@Override
-	public void commit() {
+	public void commit() throws PersistenceException {
 		try {
 			connection.commit();
 		} catch (SQLException e) {
-			throw new RollbackException(e);
+			throw new PersistenceException(e);
+		} finally {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				throw new PersistenceException(e);
+			}
 		}
 	}
 
 	@Override
-	public void rollback() {
+	public void rollback() throws PersistenceException {
 		try {
 			connection.rollback();
 		} catch (SQLException e) {
-			throw new RollbackException(e);
+			throw new PersistenceException(e);
+		} finally {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				throw new PersistenceException(e);
+			}
 		}
 	}
 
