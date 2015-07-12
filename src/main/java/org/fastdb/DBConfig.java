@@ -43,7 +43,7 @@ public class DBConfig {
 		dataSource.setAcquireIncrement(SysProperties.getInt(getServerProperty("acquireIncrement"), 1));
 		dataSource.setIdleConnectionTestPeriod(30);
 		dataSource.setTestConnectionOnCheckin(true);
-		servers.put(primaryServerName, new DBServer(dataSource));
+		servers.put(primaryServerName, new DBServer(dataSource,primaryServerName));
 	}
 
 	public static String getServerProperty(String propName) {

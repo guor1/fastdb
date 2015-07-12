@@ -18,6 +18,7 @@ import org.fastdb.FastdbException;
 import org.fastdb.PreparedStatementSetter;
 import org.fastdb.RowMapper;
 import org.fastdb.SysProperties;
+import org.fastdb.Transaction;
 import org.fastdb.util.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,21 +83,35 @@ public class DBQueryImpl implements DBQuery {
 	}
 
 	public int executeUpdate() {
+		Transaction tx = this.dbServer.currentTransaction();
+		if (tx != null) {
+			Connection conn = tx.getConnection();
+			return executeUpdate(conn);
+		} else {
+			try {
+				Connection conn = this.dbServer.getConnection();
+				try {
+					return executeUpdate(conn);
+				} finally {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				throw new FastdbException(e);
+			}
+		}
+	}
+
+	private int executeUpdate(Connection conn) {
 		if (SysProperties.debugSql()) {
 			LOGGER.info(this.sql);
 		}
 		try {
-			Connection conn = this.dbServer.getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(this.sql);
 			try {
-				PreparedStatement pstmt = conn.prepareStatement(this.sql);
-				try {
-					doPrepare(pstmt);
-					return pstmt.executeUpdate();
-				} finally {
-					pstmt.close();
-				}
+				doPrepare(pstmt);
+				return pstmt.executeUpdate();
 			} finally {
-				conn.close();
+				pstmt.close();
 			}
 		} catch (Exception e) {
 			throw new FastdbException(e);

@@ -17,10 +17,11 @@ public class DBServer {
 
 	private final DataSource dataSource;
 
-	private String serverName;
+	private final String serverName;
 
-	public DBServer(DataSource dataSource) {
+	public DBServer(DataSource dataSource, String serverName) {
 		this.dataSource = dataSource;
+		this.serverName = serverName;
 	}
 
 	public DataSource getDataSource() {
@@ -28,10 +29,6 @@ public class DBServer {
 	}
 
 	public Connection getConnection() throws SQLException {
-		Transaction tx = currentTransaction();
-		if (tx != null) {
-			return tx.getConnection();
-		}
 		return getDataSource().getConnection();
 	}
 

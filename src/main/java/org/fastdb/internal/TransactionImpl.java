@@ -13,6 +13,7 @@ public class TransactionImpl implements Transaction {
 	private Connection connection;
 
 	public TransactionImpl(Connection connection) {
+		this.connection = connection;
 		try {
 			connection.setAutoCommit(false);
 		} catch (SQLException e) {
