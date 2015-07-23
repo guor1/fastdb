@@ -17,37 +17,14 @@ public class DBConfig {
 		configure();
 	}
 
-	private static String primaryServerName;
+	private static DBServer primaryServer;
 
-	public static void configure() {
-		String dataSourceName = SysProperties.getProperty("fastdb.default");
-		if (dataSourceName == null || dataSourceName.isEmpty()) {
+	private static void configure() {
+		String primaryServerName = SysProperties.getProperty("fastdb.default");
+		if (primaryServerName == null || primaryServerName.isEmpty()) {
 			throw new FastdbException("The default DataSource has not been defined.");
 		}
-		primaryServerName = dataSourceName;
-
-		ComboPooledDataSource dataSource = new ComboPooledDataSource(false);
-		try {
-			dataSource.setDriverClass(SysProperties.getProperty(getServerProperty("driverClass")));
-		} catch (PropertyVetoException e) {
-			throw new FastdbException(e);
-		}
-		dataSource.setJdbcUrl(SysProperties.getProperty(getServerProperty("jdbcUrl")));
-		dataSource.setUser(SysProperties.getProperty(getServerProperty("user")));
-		dataSource.setPassword(SysProperties.getProperty(getServerProperty("password")));
-		dataSource.setCheckoutTimeout(SysProperties.getInt(getServerProperty("checkoutTimeout"), 5000));
-		dataSource.setMaxPoolSize(SysProperties.getInt(getServerProperty("maxPoolSize"), 10));
-		dataSource.setInitialPoolSize(SysProperties.getInt(getServerProperty("initialPoolSize"), 1));
-		dataSource.setMinPoolSize(SysProperties.getInt(getServerProperty("minPoolSize"), 3));
-		dataSource.setMaxIdleTime(SysProperties.getInt(getServerProperty("maxIdleTime"), 30));
-		dataSource.setAcquireIncrement(SysProperties.getInt(getServerProperty("acquireIncrement"), 1));
-		dataSource.setIdleConnectionTestPeriod(30);
-		dataSource.setTestConnectionOnCheckin(true);
-		servers.put(primaryServerName, new DBServer(dataSource,primaryServerName));
-	}
-
-	public static String getServerProperty(String propName) {
-		return getServerProperty(primaryServerName, propName);
+		primaryServer = getDBServerWithCreate(primaryServerName);
 	}
 
 	public static String getServerProperty(String serverName, String propName) {
@@ -55,11 +32,44 @@ public class DBConfig {
 	}
 
 	public static DBServer getPrimaryDBServer() {
-		return getDBServer(primaryServerName);
+		return primaryServer;
 	}
 
 	public static DBServer getDBServer(String serverName) {
-		return servers.get(serverName);
+		if (serverName == null || serverName.isEmpty()) {
+			return getPrimaryDBServer();
+		}
+		DBServer dbServer = servers.get(serverName);
+		if (dbServer != null) {
+			return dbServer;
+		}
+		return getDBServerWithCreate(serverName);
+	}
+
+	public static synchronized DBServer getDBServerWithCreate(String serverName) {
+		DBServer dbServer = servers.get(serverName);
+		if (dbServer == null) {
+			ComboPooledDataSource dataSource = new ComboPooledDataSource(false);
+			try {
+				dataSource.setDriverClass(SysProperties.getProperty(getServerProperty(serverName, "driverClass")));
+			} catch (PropertyVetoException e) {
+				throw new FastdbException(e);
+			}
+			dataSource.setJdbcUrl(SysProperties.getProperty(getServerProperty(serverName, "jdbcUrl")));
+			dataSource.setUser(SysProperties.getProperty(getServerProperty(serverName, "user")));
+			dataSource.setPassword(SysProperties.getProperty(getServerProperty(serverName, "password")));
+			dataSource.setCheckoutTimeout(SysProperties.getInt(getServerProperty(serverName, "checkoutTimeout"), 5000));
+			dataSource.setMaxPoolSize(SysProperties.getInt(getServerProperty(serverName, "maxPoolSize"), 10));
+			dataSource.setInitialPoolSize(SysProperties.getInt(getServerProperty(serverName, "initialPoolSize"), 1));
+			dataSource.setMinPoolSize(SysProperties.getInt(getServerProperty(serverName, "minPoolSize"), 3));
+			dataSource.setMaxIdleTime(SysProperties.getInt(getServerProperty(serverName, "maxIdleTime"), 30));
+			dataSource.setAcquireIncrement(SysProperties.getInt(getServerProperty(serverName, "acquireIncrement"), 1));
+			dataSource.setIdleConnectionTestPeriod(SysProperties.getInt(getServerProperty(serverName, "idleConnectionTestPeriod"), 30));
+			dataSource.setTestConnectionOnCheckin(SysProperties.getBoolean(getServerProperty(serverName, "testConnectionOnCheckin"), true));
+			dbServer = new DBServer(dataSource, serverName);
+			servers.put(serverName, dbServer);
+		}
+		return dbServer;
 	}
 
 	public static <T> BeanDescriptor<T> getBeanDescriptor(Class<T> klass) {
