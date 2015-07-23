@@ -61,7 +61,7 @@ public class DBConfig {
 			dataSource.setCheckoutTimeout(SysProperties.getInt(getServerProperty(serverName, "checkoutTimeout"), 5000));
 			dataSource.setMaxPoolSize(SysProperties.getInt(getServerProperty(serverName, "maxPoolSize"), 10));
 			dataSource.setInitialPoolSize(SysProperties.getInt(getServerProperty(serverName, "initialPoolSize"), 1));
-			dataSource.setMinPoolSize(SysProperties.getInt(getServerProperty(serverName, "minPoolSize"), 3));
+			dataSource.setMinPoolSize(SysProperties.getInt(getServerProperty(serverName, "minPoolSize"), 1));
 			dataSource.setMaxIdleTime(SysProperties.getInt(getServerProperty(serverName, "maxIdleTime"), 30));
 			dataSource.setAcquireIncrement(SysProperties.getInt(getServerProperty(serverName, "acquireIncrement"), 1));
 			dataSource.setIdleConnectionTestPeriod(SysProperties.getInt(getServerProperty(serverName, "idleConnectionTestPeriod"), 30));
