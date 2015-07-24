@@ -2,10 +2,11 @@ package org.fastdb.bean;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
@@ -119,6 +120,8 @@ public class BeanProperty {
 	 */
 	private Method writeMethod;
 
+	private boolean isGeneratedValue;
+
 	/**
 	 * 字段是否参与持久化
 	 */
@@ -147,7 +150,8 @@ public class BeanProperty {
 		this.propertyType = field.getType();
 		this.name = field.getName();
 
-		this.id = ReflectionUtils.annotationed(field, Id.class) || this.name.equals("id");
+		this.id = ReflectionUtils.annotationed(field, Id.class);
+		this.isGeneratedValue = this.id ? ReflectionUtils.annotationed(field, GeneratedValue.class) : false;
 		this.version = ReflectionUtils.annotationed(field, Version.class);
 		this.isTransient = !ReflectionUtils.annotationed(field, Transient.class);
 
@@ -202,16 +206,8 @@ public class BeanProperty {
 		return referencedColumnName;
 	}
 
-	public boolean isAssignableFrom(Class<?> type) {
-		return propertyType.isAssignableFrom(type);
-	}
-
-	public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
-		if (prefix == null) {
-			selectChain.add(name);
-		} else {
-			selectChain.add(prefix + "." + name);
-		}
+	public boolean isGeneratedValue() {
+		return isGeneratedValue;
 	}
 
 	public boolean isManyAssoc() {
@@ -276,10 +272,7 @@ public class BeanProperty {
 			throw new RuntimeException(msg, ex);
 		}
 
-		if (value == null) {
-			return null;
-		}
-		if (this.isOneAssoc()) {
+		if (value != null && this.isOneAssoc()) {
 			try {
 				value = DBConfig.getBeanDescriptor(value.getClass()).getBeanProperty(getReferencedColumnName()).getReadMethod()
 						.invoke(value, NO_ARGS);
@@ -288,6 +281,12 @@ public class BeanProperty {
 				String msg = "get " + name + " on [" + getName() + "] type[" + beanType + "] threw error.";
 				throw new RuntimeException(msg, ex);
 			}
+		}
+		if (value == null && this.isVersion()) {
+			if (propertyType == java.util.Date.class || propertyType == java.sql.Date.class || propertyType == java.sql.Timestamp.class) {
+				return new Timestamp(System.currentTimeMillis());
+			}
+			return System.currentTimeMillis();
 		}
 		return value;
 	}

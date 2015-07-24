@@ -1,6 +1,5 @@
 package fastdb.core;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import org.fastdb.DB;
@@ -34,7 +33,6 @@ public class TestContex {
 		contex.setExpression("c:article_content");
 		contex.setTemplate("legal.firefox.news.cn/[d]/[d]/[d]/[*].jsp");
 		contex.setUser(new User(id));
-		contex.setLastoptime(new Timestamp(System.currentTimeMillis()));
 		DB.persist(contex);
 	}
 

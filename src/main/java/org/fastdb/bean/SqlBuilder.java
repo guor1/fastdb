@@ -64,7 +64,13 @@ public class SqlBuilder<T> {
 			buf.append(this.beanDescriptor.getTableName()).append(" (");
 			int count = 0;
 			for (BeanProperty property : this.beanDescriptor.getProperties()) {
-				if (property.isId() || !property.isDbInsertable() || property.isManyAssoc()) {
+				if (!property.isDbInsertable() || property.isManyAssoc() || !property.isTransient()) {
+					continue;
+				}
+				/**
+				 * 自增ID
+				 */
+				if (property.isId() && property.isGeneratedValue()) {
 					continue;
 				}
 				if (count++ > 0) {

@@ -42,7 +42,10 @@ public class DBServer {
 		int p = 1;
 		List<BeanProperty> properties = beanDescriptor.getProperties();
 		for (BeanProperty property : properties) {
-			if (property.isId() || !property.isDbInsertable() || property.isManyAssoc()) {
+			if (!property.isDbInsertable() || property.isManyAssoc() || !property.isTransient()) {
+				continue;
+			}
+			if (property.isId() && property.isGeneratedValue()) {
 				continue;
 			}
 			dbQuery.setParameter(p++, property.getValue(entity));
@@ -53,7 +56,7 @@ public class DBServer {
 	public <T> List<T> findList(Class<T> entityClass) {
 		BeanDescriptor<T> beanDescriptor = DBConfig.getBeanDescriptor(entityClass);
 		try {
-			return DBUtils.buildResult(beanDescriptor, createNativeQuery("select * from " + beanDescriptor.getTableName()).getResultList());
+			return DBUtils.buildResult(beanDescriptor, createNativeQuery("SELECT * FROM " + beanDescriptor.getTableName()).getResultList());
 		} catch (Exception e) {
 			throw new FastdbException(e);
 		}
@@ -93,8 +96,7 @@ public class DBServer {
 	/**
 	 * create a query based on a manual sql
 	 * 
-	 * @param sql
-	 *            sql to be executed
+	 * @param sql sql to be executed
 	 * @return
 	 */
 	public DBQuery createNativeQuery(String sqlString) {

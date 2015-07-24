@@ -102,9 +102,6 @@ public class Contex implements Serializable {
 	}
 
 	public Timestamp getLastoptime() {
-		if (lastoptime == null) {
-			lastoptime = new Timestamp(System.currentTimeMillis());
-		}
 		return lastoptime;
 	}
 

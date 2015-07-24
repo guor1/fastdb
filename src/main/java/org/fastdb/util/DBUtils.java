@@ -157,6 +157,10 @@ public class DBUtils {
 				ps.setObject(paramIndex, inValue, Types.TIMESTAMP);
 			}
 		} else {
+			if (inValue == null) {
+				ps.setObject(paramIndex, null);
+				return;
+			}
 			if (isStringValue(inValue.getClass())) {
 				ps.setString(paramIndex, inValue.toString());
 			} else if (isDateValue(inValue.getClass())) {
