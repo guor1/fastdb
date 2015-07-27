@@ -108,6 +108,12 @@ public class DB {
 		DBConfig.getPrimaryDBServer().rollbackTransaction();
 	}
 
+	/**
+	 * get DBServer by serverName
+	 * 
+	 * @param serverName
+	 * @return
+	 */
 	public static DBServer use(String serverName) {
 		return DBConfig.getDBServer(serverName);
 	}
