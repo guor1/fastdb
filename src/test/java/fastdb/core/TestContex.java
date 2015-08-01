@@ -24,7 +24,7 @@ public class TestContex {
 		u.setUsername("guor");
 		DB.persist(u);
 
-		DBRow dbRow = DB.createNativeQuery("SELECT * FROM `wdyq_user` WHERE `username`=?").setParameter(1, "guor").getSingleResult();
+		DBRow dbRow = DB.createNativeQuery("SELECT * FROM `wdyq_user` WHERE `username`=?").setParameter(1, "guor").findUnique();
 		Long id = Long.parseLong(dbRow.get("ID").toString());
 
 		Contex contex = new Contex();

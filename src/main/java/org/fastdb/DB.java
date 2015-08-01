@@ -117,4 +117,8 @@ public class DB {
 	public static DBServer use(String serverName) {
 		return DBConfig.getDBServer(serverName);
 	}
+
+	public static DBServer usePrimaryDBServer() {
+		return DBConfig.getPrimaryDBServer();
+	}
 }

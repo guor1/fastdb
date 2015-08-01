@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.fastdb.DBConfig;
 import org.fastdb.DBQuery;
 import org.fastdb.DBRow;
 import org.fastdb.DBServer;
@@ -38,7 +39,7 @@ public class DBQueryImpl implements DBQuery {
 		this.sql = sql;
 	}
 
-	public List<DBRow> getResultList() {
+	public List<DBRow> findList() {
 		if (SysProperties.debugSql()) {
 			LOGGER.info(this.sql);
 		}
@@ -74,8 +75,8 @@ public class DBQueryImpl implements DBQuery {
 		}
 	}
 
-	public DBRow getSingleResult() {
-		List<DBRow> list = getResultList();
+	public DBRow findUnique() {
+		List<DBRow> list = findList();
 		if (list == null || list.isEmpty()) {
 			return null;
 		}
@@ -163,5 +164,23 @@ public class DBQueryImpl implements DBQuery {
 			throw new FastdbException(e);
 		}
 		return result;
+	}
+
+	@Override
+	public <T> List<T> findList(Class<T> klass) {
+		try {
+			return DBUtils.buildResult(this.dbServer, DBConfig.getBeanDescriptor(klass), findList());
+		} catch (Exception e) {
+			throw new FastdbException(e.getMessage());
+		}
+	}
+
+	@Override
+	public <T> T findUnique(Class<T> klass) {
+		try {
+			return DBUtils.buildResult(this.dbServer, DBConfig.getBeanDescriptor(klass), findUnique());
+		} catch (Exception e) {
+			throw new FastdbException(e.getMessage());
+		}
 	}
 }

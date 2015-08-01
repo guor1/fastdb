@@ -10,6 +10,7 @@ import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
 
 import org.fastdb.DB;
+import org.fastdb.DBServer;
 import org.fastdb.FastdbException;
 
 /**
@@ -22,10 +23,12 @@ import org.fastdb.FastdbException;
  */
 public class LazyInitializer implements MethodHandler {
 
+	private final DBServer dbServer;
 	private final Class<?> klass;
 	private final Object primaryKey;
 
-	private LazyInitializer(final Class<?> klass, Object primaryKey) {
+	private LazyInitializer(final DBServer dbServer, final Class<?> klass, Object primaryKey) {
+		this.dbServer = dbServer;
 		this.klass = klass;
 		this.primaryKey = primaryKey;
 	}
@@ -33,12 +36,14 @@ public class LazyInitializer implements MethodHandler {
 	/**
 	 * 获取一个动态代理对象
 	 * 
-	 * @param sourceClass 被代理的类
-	 * @param id 数据的唯一标识
+	 * @param sourceClass
+	 *            被代理的类
+	 * @param id
+	 *            数据的唯一标识
 	 * @return 返回代理的对象
 	 */
-	public static ProxyObject load(final Class<?> klass, Object primaryKey) {
-		final LazyInitializer instance = new LazyInitializer(klass, primaryKey);
+	public static ProxyObject load(final DBServer dbServer, final Class<?> klass, Object primaryKey) {
+		final LazyInitializer instance = new LazyInitializer(dbServer == null ? DB.usePrimaryDBServer() : dbServer, klass, primaryKey);
 		ProxyFactory factory = new ProxyFactory();
 		factory.setSuperclass(klass);
 		/**
@@ -70,7 +75,10 @@ public class LazyInitializer implements MethodHandler {
 		/**
 		 * 从数据库加载数据
 		 */
-		Object target = DB.find(klass, primaryKey);
+		Object target = this.dbServer.find(klass, primaryKey);
+		if (target == null) {
+			return null;
+		}
 		try {
 			final Object returnValue;
 			if (Modifier.isPublic(thisMethod.getModifiers())) {

@@ -28,7 +28,7 @@ public class TestDBServer {
 	@Test
 	public void testNativeQuery() {
 		DBQuery dbQuery = dbServer.createNativeQuery("select * from wdyq_contex");
-		List<DBRow> resultList = dbQuery.getResultList();
+		List<DBRow> resultList = dbQuery.findList();
 		Assert.assertEquals(0, resultList.size());
 
 		dbQuery = dbServer.createNativeQuery("insert into `wdyq_contex` (`host`,`doctype`,`template`,`expression`,`lastoptime`) values (?,?,?,?,?)");
@@ -42,7 +42,7 @@ public class TestDBServer {
 		Assert.assertEquals(1, d);
 
 		dbQuery = dbServer.createNativeQuery("select * from `wdyq_contex`");
-		resultList = dbQuery.getResultList();
+		resultList = dbQuery.findList();
 		Assert.assertEquals(1, resultList.size());
 	}
 

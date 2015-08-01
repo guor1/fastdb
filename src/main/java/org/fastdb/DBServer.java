@@ -56,7 +56,7 @@ public class DBServer {
 	public <T> List<T> findList(Class<T> entityClass) {
 		BeanDescriptor<T> beanDescriptor = DBConfig.getBeanDescriptor(entityClass);
 		try {
-			return DBUtils.buildResult(beanDescriptor, createNativeQuery("SELECT * FROM " + beanDescriptor.getTableName()).getResultList());
+			return DBUtils.buildResult(this, beanDescriptor, createNativeQuery("SELECT * FROM " + beanDescriptor.getTableName()).findList());
 		} catch (Exception e) {
 			throw new FastdbException(e);
 		}
@@ -72,8 +72,8 @@ public class DBServer {
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
 		BeanDescriptor<T> beanDescriptor = DBConfig.getBeanDescriptor(entityClass);
 		try {
-			return DBUtils.buildResult(beanDescriptor, createNativeQuery(beanDescriptor.buildFindByIdSql()).setParameter(1, primaryKey)
-					.getSingleResult());
+			return DBUtils.buildResult(this, beanDescriptor, createNativeQuery(beanDescriptor.buildFindByIdSql()).setParameter(1, primaryKey)
+					.findUnique());
 		} catch (Exception e) {
 			throw new FastdbException(e);
 		}
@@ -96,7 +96,8 @@ public class DBServer {
 	/**
 	 * create a query based on a manual sql
 	 * 
-	 * @param sql sql to be executed
+	 * @param sql
+	 *            sql to be executed
 	 * @return
 	 */
 	public DBQuery createNativeQuery(String sqlString) {

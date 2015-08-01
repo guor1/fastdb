@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.fastdb.DBRow;
+import org.fastdb.DBServer;
 import org.fastdb.bean.BeanDescriptor;
 import org.fastdb.bean.BeanProperty;
 import org.fastdb.bean.LazyInitializer;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class DBUtils {
 	private static Logger LOGGER = LoggerFactory.getLogger(DBUtils.class);
 
-	public static <T> T buildResult(BeanDescriptor<T> beanDescriptor, ResultSet rs) throws Exception {
+	public static <T> T buildResult(DBServer dbServer, BeanDescriptor<T> beanDescriptor, ResultSet rs) throws Exception {
 		Class<T> beanType = beanDescriptor.getBeanType();
 		T instance = beanType.newInstance();
 
@@ -33,7 +34,7 @@ public class DBUtils {
 			String columnLabel = rsmd.getColumnLabel(i);
 			BeanProperty beanProperty = beanDescriptor.getBeanProperty(columnLabel);
 			if (beanProperty == null) {
-				LOGGER.warn("Unmapped column " + columnLabel + " in " + beanDescriptor.getBeanType());
+				LOGGER.debug("Unmapped column " + columnLabel + " in " + beanDescriptor.getBeanType());
 				continue;
 			}
 			Method writeMethod = beanProperty.getWriteMethod();
@@ -41,7 +42,7 @@ public class DBUtils {
 			 * lazy load the many side object
 			 */
 			if (beanProperty.isManyAssoc()) {
-				writeMethod.invoke(instance, LazyInitializer.load(beanProperty.getPropertyType(), rs.getObject(columnLabel)));
+				writeMethod.invoke(instance, LazyInitializer.load(dbServer, beanProperty.getPropertyType(), rs.getObject(columnLabel)));
 			} else {
 				writeMethod.invoke(instance, rs.getObject(columnLabel));
 			}
@@ -49,18 +50,18 @@ public class DBUtils {
 		return instance;
 	}
 
-	public static <T> List<T> buildResult(BeanDescriptor<T> beanDescriptor, List<DBRow> dbRows) throws Exception {
+	public static <T> List<T> buildResult(DBServer dbServer, BeanDescriptor<T> beanDescriptor, List<DBRow> dbRows) throws Exception {
 		List<T> result = new LinkedList<T>();
 		if (dbRows == null || dbRows.isEmpty()) {
 			return result;
 		}
 		for (DBRow row : dbRows) {
-			result.add(buildResult(beanDescriptor, row));
+			result.add(buildResult(dbServer, beanDescriptor, row));
 		}
 		return result;
 	}
 
-	public static <T> T buildResult(BeanDescriptor<T> beanDescriptor, DBRow dbRow) throws Exception {
+	public static <T> T buildResult(DBServer dbServer, BeanDescriptor<T> beanDescriptor, DBRow dbRow) throws Exception {
 		if (dbRow == null) {
 			return null;
 		}
@@ -72,7 +73,7 @@ public class DBUtils {
 			String columnLabel = iterator.next();
 			BeanProperty beanProperty = beanDescriptor.getBeanProperty(columnLabel);
 			if (beanProperty == null) {
-				LOGGER.warn("Unmapped column " + columnLabel + " in " + beanDescriptor.getBeanType());
+				LOGGER.debug("Unmapped column " + columnLabel + " in " + beanDescriptor.getBeanType());
 				continue;
 			}
 			Method writeMethod = beanProperty.getWriteMethod();
@@ -80,7 +81,7 @@ public class DBUtils {
 			 * lazy load the many side object
 			 */
 			if (beanProperty.isOneAssoc()) {
-				writeMethod.invoke(instance, LazyInitializer.load(beanProperty.getPropertyType(), dbRow.get(columnLabel)));
+				writeMethod.invoke(instance, LazyInitializer.load(dbServer, beanProperty.getPropertyType(), dbRow.get(columnLabel)));
 			} else {
 				writeMethod.invoke(instance, dbRow.get(columnLabel));
 			}
