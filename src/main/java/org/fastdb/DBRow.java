@@ -16,10 +16,12 @@ public class DBRow extends HashMap<String, Object> {
 	private static final long serialVersionUID = 4247959745278175790L;
 
 	public String getString(String key) {
-		return get(key).toString();
+		Object object = get(key);
+		return object == null ? null : object.toString();
 	}
 
 	public int getInt(String key) {
-		return Integer.parseInt(getString(key));
+		String s = getString(key);
+		return (s == null || s.isEmpty()) ? 0 : Integer.parseInt(s);
 	}
 }
