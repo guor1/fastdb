@@ -110,6 +110,9 @@ public class DBUtils {
 	}
 
 	public static void setParameterValue(PreparedStatement ps, int paramIndex, int sqlType, Object inValue) throws SQLException {
+		if (inValue == null) {
+			ps.setNull(paramIndex, sqlType);
+		}
 		if (sqlType == Types.VARCHAR || sqlType == Types.LONGVARCHAR || (sqlType == Types.CLOB && isStringValue(inValue.getClass()))) {
 			ps.setString(paramIndex, inValue.toString());
 		} else if (sqlType == Types.DECIMAL || sqlType == Types.NUMERIC) {
