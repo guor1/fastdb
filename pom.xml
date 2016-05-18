@@ -57,6 +57,16 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>peony</id>
+			<url>http://bigone.50izqj.pek2.qingcloud.com:8083/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>peony</id>
+			<url>http://bigone.50izqj.pek2.qingcloud.com:8083/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
