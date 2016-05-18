@@ -6,9 +6,9 @@
 	<version>0.0.8</version>
 	<dependencies>
 		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.5</version>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP-java6</artifactId>
+			<version>2.3.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -48,7 +48,7 @@
 		<repository>
 			<id>nexus</id>
 			<name>Team Nexus Repository</name>
-			<url>http://119.254.110.32:8083/nexus/content/groups/public</url>
+			<url>http://bigone.50izqj.pek2.qingcloud.com:8083/nexus/content/groups/public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -57,29 +57,6 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>nexus</id>
-			<name>Team Nexus Repository</name>
-			<url>http://119.254.110.32:8083/nexus/content/groups/public</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
-	<distributionManagement>
-		<repository>
-			<id>peony</id>
-			<url>http://119.254.110.32:8083/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>peony</id>
-			<url>http://119.254.110.32:8083/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
@@ -120,11 +97,5 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-			</resource>
-		</resources>
 	</build>
 </project>
