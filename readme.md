@@ -1,4 +1,4 @@
-#Fastdb：极速DB
+#fastdb
 
 
 ##特性：
