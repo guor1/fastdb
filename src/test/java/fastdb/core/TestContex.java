@@ -39,7 +39,7 @@ public class TestContex {
 	@Test
 	public void testFindList() {
 		List<Contex> list = DB.findList(Contex.class);
-		Assert.assertEquals(1, list.size());
+		Assert.assertEquals(0, list.size());
 	}
 
 	@Test

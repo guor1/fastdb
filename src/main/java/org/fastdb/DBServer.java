@@ -1,11 +1,5 @@
 package org.fastdb;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.fastdb.bean.BeanDescriptor;
 import org.fastdb.bean.BeanProperty;
 import org.fastdb.internal.DBQueryImpl;
@@ -13,11 +7,16 @@ import org.fastdb.internal.TransactionImpl;
 import org.fastdb.internal.TransactionThreadLocal;
 import org.fastdb.util.DBUtils;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+
 public class DBServer {
 
     private final DataSource dataSource;
 
-    private final String     serverName;
+    private final String serverName;
 
     public DBServer(DataSource dataSource, String serverName) {
         this.dataSource = dataSource;
@@ -65,7 +64,7 @@ public class DBServer {
 
     /**
      * find unique entity by primaryKey
-     * 
+     *
      * @param entityClass
      * @param primaryKey
      * @return
@@ -86,7 +85,6 @@ public class DBServer {
     }
 
     /**
-     * 
      * @param entity
      */
     public int delete(Object entity) {
@@ -96,8 +94,8 @@ public class DBServer {
 
     /**
      * create a query based on a manual sql
-     * 
-     * @param sql sql to be executed
+     *
+     * @param sqlString sql to be executed
      * @return
      */
     public DBQuery createNativeQuery(String sqlString) {
@@ -106,7 +104,7 @@ public class DBServer {
 
     /**
      * Start a new transaction putting it into a ThreadLocal.
-     * 
+     *
      * @throws SQLException
      */
     public Transaction beginTransaction() throws SQLException {
@@ -127,19 +125,13 @@ public class DBServer {
      * Commit the current transaction.
      */
     public void commitTransaction() {
-        Transaction transaction = currentTransaction();
-        if (transaction != null) {
-            transaction.commit();
-        }
+        TransactionThreadLocal.commit(getServerName());
     }
 
     /**
      * Rollback the current transaction.
      */
     public void rollbackTransaction() {
-        Transaction transaction = currentTransaction();
-        if (transaction != null) {
-            transaction.rollback();
-        }
+        TransactionThreadLocal.rollback(getServerName());
     }
 }

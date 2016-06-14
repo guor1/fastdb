@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.fastdb.DB;
 import org.fastdb.FastdbException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -12,8 +13,8 @@ import fastdb.core.bean.User;
 
 public class TestTransaction {
 
-	@BeforeClass
-	public static void init() {
+	@Before
+	public void init() {
 		H2Database.initTable();
 		User u = new User();
 		u.setUsername("guor");

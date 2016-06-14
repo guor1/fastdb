@@ -1,22 +1,27 @@
 package org.fastdb;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.fastdb.bean.BeanDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.fastdb.bean.BeanDescriptor;
-
-import com.zaxxer.hikari.HikariDataSource;
-
 public class DBConfig {
 
-    private static Map<String, DBServer>          servers = new HashMap<String, DBServer>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBConfig.class);
+
+    private static Map<String, DBServer> servers = new HashMap<String, DBServer>();
 
     private static Map<String, BeanDescriptor<?>> beanMap = new HashMap<String, BeanDescriptor<?>>();
+
     static {
         configure();
     }
 
-    private static DBServer                       primaryServer;
+    private static DBServer primaryServer;
 
     private static void configure() {
         String primaryServerName = SysProperties.getProperty("fastdb.default");
@@ -48,17 +53,21 @@ public class DBConfig {
     public static synchronized DBServer getDBServerWithCreate(String serverName) {
         DBServer dbServer = servers.get(serverName);
         if (dbServer == null) {
-            HikariDataSource dataSource = new HikariDataSource();
-            dataSource.setDriverClassName(SysProperties.getProperty(getServerProperty(serverName, "driverClass")));
+            ComboPooledDataSource dataSource = new ComboPooledDataSource();
+            try {
+                dataSource.setDriverClass(SysProperties.getProperty(getServerProperty(serverName, "driverClass")));
+            } catch (PropertyVetoException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
             dataSource.setJdbcUrl(SysProperties.getProperty(getServerProperty(serverName, "jdbcUrl")));
-            dataSource.setUsername(SysProperties.getProperty(getServerProperty(serverName, "user")));
+            dataSource.setUser(SysProperties.getProperty(getServerProperty(serverName, "user")));
             dataSource.setPassword(SysProperties.getProperty(getServerProperty(serverName, "password")));
-            dataSource.setConnectionTimeout(SysProperties.getInt(getServerProperty(serverName, "checkoutTimeout"),
+            dataSource.setCheckoutTimeout(SysProperties.getInt(getServerProperty(serverName, "checkoutTimeout"),
                     30 * 1000));
-            dataSource.setMaximumPoolSize(SysProperties.getInt(getServerProperty(serverName, "maxPoolSize"), 10));
-            dataSource.setMinimumIdle(SysProperties.getInt(getServerProperty(serverName, "minPoolSize"), 1));
+            dataSource.setMaxPoolSize(SysProperties.getInt(getServerProperty(serverName, "maxPoolSize"), 10));
+            dataSource.setMinPoolSize(SysProperties.getInt(getServerProperty(serverName, "minPoolSize"), 1));
             dataSource
-                    .setMaxLifetime(SysProperties.getInt(getServerProperty(serverName, "maxIdleTime"), 5 * 60 * 1000));
+                    .setMaxIdleTime(SysProperties.getInt(getServerProperty(serverName, "maxIdleTime"), 5 * 60 * 1000));
             dbServer = new DBServer(dataSource, serverName);
             servers.put(serverName, dbServer);
         }
