@@ -18,7 +18,7 @@ public interface Transaction {
 	/**
 	 * get the connection on the current transaction
 	 * 
-	 * @return
+	 * @return the connection on the current transaction
 	 */
 	Connection getConnection();
 }

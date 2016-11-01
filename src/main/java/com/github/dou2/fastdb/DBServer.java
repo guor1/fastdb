@@ -68,7 +68,7 @@ public class DBServer {
      *
      * @param entityClass
      * @param primaryKey
-     * @return
+     * @return unique entity or null
      */
     public <T> T find(Class<T> entityClass, Object primaryKey) {
         BeanDescriptor<T> beanDescriptor = DBConfig.getBeanDescriptor(entityClass);
@@ -97,7 +97,7 @@ public class DBServer {
      * create a query based on a manual sql
      *
      * @param sqlString sql to be executed
-     * @return
+     * @return DBQuery instance
      */
     public DBQuery createNativeQuery(String sqlString) {
         return new DBQueryImpl(this, sqlString);

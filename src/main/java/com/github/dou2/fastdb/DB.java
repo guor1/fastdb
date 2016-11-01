@@ -66,8 +66,8 @@ public class DB {
     /**
      * create a query based on a manual sql
      * 
-     * @param sql sql to be executed
-     * @return
+     * @param sqlString sql to be executed
+     * @return DBQuery instance
      */
     public static DBQuery createNativeQuery(String sqlString) {
         return DBConfig.getPrimaryDBServer().createNativeQuery(sqlString);
@@ -108,7 +108,7 @@ public class DB {
      * get DBServer by serverName
      * 
      * @param serverName
-     * @return
+     * @return DBServer instance
      */
     public static DBServer use(String serverName) {
         return DBConfig.getDBServer(serverName);

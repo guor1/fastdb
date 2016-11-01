@@ -60,7 +60,7 @@ public interface DBQuery {
 	/**
 	 * Bind the value of a Parameter object.
 	 *
-	 * @param param
+	 * @param position
 	 *            parameter object
 	 * @param value
 	 *            parameter value
@@ -76,11 +76,11 @@ public interface DBQuery {
 	/**
 	 * Bind an instance of a Parameter object with a given SqlType.
 	 *
-	 * @param param
+	 * @param position
 	 *            parameter object
 	 * @param value
 	 *            parameter value
-	 * @param temporalType
+	 * @param sqlType
 	 *            temporal type
 	 *
 	 * @return the same query instance
@@ -102,7 +102,7 @@ public interface DBQuery {
 	 *            object that can create a PreparedStatement given a Connection
 	 * @param rowMapper
 	 *            object that will map one object per row
-	 * @return
+	 * @return resultset list object
 	 */
 	<T> List<T> executeQuery(PreparedStatementSetter psc, RowMapper<T> rowMapper);
 }

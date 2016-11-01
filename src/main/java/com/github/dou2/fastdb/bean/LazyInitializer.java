@@ -16,7 +16,7 @@ import com.github.dou2.fastdb.FastdbException;
 /**
  * To lazy load an object by ID property. Here is a passage about lazy load.
  * 
- * @see http://blog.csdn.net/abguorui0928/article/details/34558897
+ * http://blog.csdn.net/abguorui0928/article/details/34558897
  * 
  * @author guor
  *
@@ -36,9 +36,9 @@ public class LazyInitializer implements MethodHandler {
 	/**
 	 * 获取一个动态代理对象
 	 * 
-	 * @param sourceClass
+	 * @param klass
 	 *            被代理的类
-	 * @param id
+	 * @param primaryKey
 	 *            数据的唯一标识
 	 * @return 返回代理的对象
 	 */
