@@ -1,5 +1,15 @@
 #fastdb
 
+## Maven
+
+```xml
+<dependency>
+    <groupId>com.github.dou2</groupId>
+    <artifactId>fastdb</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
 ##特性：
 
 1. 运行高效，配置简单，这是所有API设计的最基本原则
