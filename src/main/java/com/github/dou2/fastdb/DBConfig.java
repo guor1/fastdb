@@ -1,12 +1,11 @@
 package com.github.dou2.fastdb;
 
 import com.github.dou2.fastdb.bean.BeanDescriptor;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
+import com.github.dou2.fastdb.pool.DataSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyVetoException;
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +13,9 @@ public class DBConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBConfig.class);
 
-    private static Map<String, DBServer> servers = new HashMap<String, DBServer>();
+    private static Map<String, DBServer> servers = new HashMap<>();
 
-    private static Map<String, BeanDescriptor<?>> beanMap = new HashMap<String, BeanDescriptor<?>>();
+    private static Map<String, BeanDescriptor<?>> beanMap = new HashMap<>();
 
     static {
         configure();
@@ -51,25 +50,24 @@ public class DBConfig {
         return getDBServerWithCreate(serverName);
     }
 
+    public static DBServer createServer(String serverName, DataSource dataSource) {
+        if (serverName == null || serverName.isEmpty()) {
+            throw new FastdbException("DBServer name must not null.");
+        }
+        if (servers.containsKey(serverName)) {
+            throw new FastdbException("DBServer with name=" + serverName + " already exists.");
+        }
+        DBServer dbServer = new DBServer(dataSource, serverName);
+        servers.put(serverName, dbServer);
+        return dbServer;
+    }
+
+
     public static synchronized DBServer getDBServerWithCreate(String serverName) {
         DBServer dbServer = servers.get(serverName);
         if (dbServer == null) {
-            ComboPooledDataSource dataSource = new ComboPooledDataSource();
-            try {
-                dataSource.setDriverClass(SysProperties.getProperty(getServerProperty(serverName, "driverClass")));
-            } catch (PropertyVetoException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-            dataSource.setJdbcUrl(SysProperties.getProperty(getServerProperty(serverName, "jdbcUrl")));
-            dataSource.setUser(SysProperties.getProperty(getServerProperty(serverName, "user")));
-            dataSource.setPassword(SysProperties.getProperty(getServerProperty(serverName, "password")));
-            dataSource.setCheckoutTimeout(SysProperties.getInt(getServerProperty(serverName, "checkoutTimeout"),
-                    30 * 1000));
-            dataSource.setMaxPoolSize(SysProperties.getInt(getServerProperty(serverName, "maxPoolSize"), 10));
-            dataSource.setMinPoolSize(SysProperties.getInt(getServerProperty(serverName, "minPoolSize"), 1));
-            dataSource
-                    .setMaxIdleTime(SysProperties.getInt(getServerProperty(serverName, "maxIdleTime"), 5 * 60 * 1000));
-            dbServer = new DBServer(dataSource, serverName);
+            DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create(getServerProperty(serverName, "type"));
+            dbServer = new DBServer(dataSourceBuilder.build(), serverName);
             servers.put(serverName, dbServer);
         }
         return dbServer;
@@ -94,7 +92,7 @@ public class DBConfig {
             return beanDescriptor;
         }
         synchronized (DBConfig.class) {
-            beanDescriptor = new BeanDescriptor<T>(klass);
+            beanDescriptor = new BeanDescriptor<>(klass);
             beanMap.put(klass.getName(), beanDescriptor);
         }
         return beanDescriptor;

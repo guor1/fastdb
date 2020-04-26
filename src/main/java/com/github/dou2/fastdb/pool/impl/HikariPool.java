@@ -1,0 +1,19 @@
+package com.github.dou2.fastdb.pool.impl;
+
+import com.github.dou2.fastdb.pool.DataSourceBuilder;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import javax.sql.DataSource;
+
+public class HikariPool extends DataSourceBuilder {
+    @Override
+    public DataSource build() {
+        HikariConfig config = new HikariConfig();
+        config.setUsername(getProp("username"));
+        config.setPassword(getProp("password"));
+        config.setJdbcUrl(getProp("jdbcUrl"));
+        config.setDriverClassName(getProp("driverClassName"));
+        return new HikariDataSource(config);
+    }
+}

@@ -1,15 +1,14 @@
 package com.github.dou2.fastdb;
 
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.persistence.PersistenceException;
-
 /**
  * Provide static methods that proxy for the <em>'default'</em> DBServer.
- * 
- * @author guor
  *
+ * @author guor
  */
 public class DB {
 
@@ -24,7 +23,7 @@ public class DB {
      * specify a cascade of CascadeType.ALL or CascadeType.PERSIST on the
      * OneToMany, OneToOne or ManyToMany annotation.
      * </p>
-     * 
+     *
      * @param entity entity instance
      * @throws PersistenceException if occurs any SQLException
      */
@@ -38,7 +37,7 @@ public class DB {
 
     /**
      * Delete an entity.
-     * 
+     *
      * @param entity entity instance
      * @throws PersistenceException if occurs any SQLException
      */
@@ -53,9 +52,9 @@ public class DB {
     /**
      * Find entity by primary key. Search for an entity of the specified class
      * and primary key.
-     * 
+     *
      * @param entityClass entity class
-     * @param primaryKey primary key
+     * @param primaryKey  primary key
      * @return the found entity instance or null if the entity does not exist
      * @throws PersistenceException if occurs any SQLException
      */
@@ -65,7 +64,7 @@ public class DB {
 
     /**
      * create a query based on a manual sql
-     * 
+     *
      * @param sqlString sql to be executed
      * @return DBQuery instance
      */
@@ -75,8 +74,8 @@ public class DB {
 
     /**
      * Start a new transaction putting it into a ThreadLocal.
-     * 
-     * @throws SQLException
+     *
+     * @throws SQLException 开启事务失败，抛出异常
      */
     public static Transaction beginTransaction() throws SQLException {
         return DBConfig.getPrimaryDBServer().beginTransaction();
@@ -106,8 +105,8 @@ public class DB {
 
     /**
      * get DBServer by serverName
-     * 
-     * @param serverName
+     *
+     * @param serverName 数据源名称
      * @return DBServer instance
      */
     public static DBServer use(String serverName) {
@@ -116,5 +115,9 @@ public class DB {
 
     public static DBServer usePrimaryDBServer() {
         return DBConfig.getPrimaryDBServer();
+    }
+
+    public static DBServer createServer(String serverName, DataSource dataSource) {
+        return DBConfig.createServer(serverName, dataSource);
     }
 }
