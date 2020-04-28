@@ -6,7 +6,7 @@
 <dependency>
     <groupId>com.github.dou2</groupId>
     <artifactId>fastdb</artifactId>
-    <version>0.1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
@@ -42,15 +42,9 @@
 fastdb.debug.sql=true
 fastdb.default=h2db
 
-#fastdb.h2db.acquireIncrement=1
-#fastdb.h2db.checkoutTimeout=5000
-#fastdb.h2db.initialPoolSize=3
-#fastdb.h2db.maxIdleTime=60
-#fastdb.h2db.maxPoolSize=15
-#fastdb.h2db.minPoolSize=3
-fastdb.h2db.driverClass=org.h2.Driver
+fastdb.h2db.driverClassName=org.h2.Driver
 fastdb.h2db.jdbcUrl=jdbc:h2:~/test
-fastdb.h2db.user=root
+fastdb.h2db.username=root
 fastdb.h2db.password=root
 ```
 
