@@ -21,15 +21,15 @@ public abstract class DataSourceBuilder {
         if (StringUtils.isEmpty(type)) {
             throw new FastdbException("数据库连接池类型不能为空.");
         }
-        if (StringUtils.equalsIgnoreCase("com.zaxxer.hikari.HikariDataSource", type)) {
+        if (StringUtils.equalsIgnoreCase(HikariPool.TYPE, type)) {
             return new HikariPool();
-        } else if (StringUtils.equalsIgnoreCase("org.apache.commons.dbcp2.BasicDataSource", type)) {
+        } else if (StringUtils.equalsIgnoreCase(DbcpPool.TYPE, type)) {
             return new DbcpPool();
-        } else if (StringUtils.equalsIgnoreCase("com.mchange.v2.c3p0.ComboPooledDataSource", type)) {
+        } else if (StringUtils.equalsIgnoreCase(C3p0Pool.TYPE, type)) {
             return new C3p0Pool();
-        } else if (StringUtils.equalsIgnoreCase("com.alibaba.druid.pool.DruidDataSource", type)) {
+        } else if (StringUtils.equalsIgnoreCase(DruidPool.TYPE, type)) {
             return new DruidPool();
-        } else if (StringUtils.equalsIgnoreCase("org.apache.tomcat.jdbc.pool.DataSource", type)) {
+        } else if (StringUtils.equalsIgnoreCase(TomcatPool.TYPE, type)) {
             return new TomcatPool();
         }
         throw new FastdbException("未知的数据库连接池类型.");

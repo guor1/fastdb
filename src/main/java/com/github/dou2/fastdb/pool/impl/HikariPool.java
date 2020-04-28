@@ -7,6 +7,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 
 public class HikariPool extends DataSourceBuilder {
+    public static final String TYPE = HikariDataSource.class.getName();
+
     @Override
     public DataSource build() {
         HikariConfig config = new HikariConfig();

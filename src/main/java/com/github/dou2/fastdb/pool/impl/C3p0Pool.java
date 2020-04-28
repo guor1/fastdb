@@ -10,6 +10,7 @@ import java.beans.PropertyVetoException;
 
 public class C3p0Pool extends DataSourceBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(C3p0Pool.class);
+    public static final String TYPE = ComboPooledDataSource.class.getName();
 
     @Override
     public DataSource build() {
@@ -24,4 +25,6 @@ public class C3p0Pool extends DataSourceBuilder {
         dataSource.setPassword(getProp("password"));
         return dataSource;
     }
+
+
 }

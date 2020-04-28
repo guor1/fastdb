@@ -6,6 +6,8 @@ import com.github.dou2.fastdb.pool.DataSourceBuilder;
 import javax.sql.DataSource;
 
 public class DruidPool extends DataSourceBuilder {
+    public static final String TYPE = DruidDataSource.class.getName();
+
     @Override
     public DataSource build() {
         DruidDataSource dataSource = new DruidDataSource();

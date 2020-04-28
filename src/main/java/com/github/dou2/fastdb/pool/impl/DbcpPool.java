@@ -6,6 +6,8 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import javax.sql.DataSource;
 
 public class DbcpPool extends DataSourceBuilder {
+    public static final String TYPE = BasicDataSource.class.getName();
+
     @Override
     public DataSource build() {
         BasicDataSource dataSource = new BasicDataSource();

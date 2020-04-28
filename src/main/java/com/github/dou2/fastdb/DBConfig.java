@@ -67,7 +67,11 @@ public class DBConfig {
     public static synchronized DBServer getDBServerWithCreate(String serverName) {
         DBServer dbServer = servers.get(serverName);
         if (dbServer == null) {
-            DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create(getServerProperty(serverName, "type"));
+            DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create(SysProperties.getProperty(getServerProperty(serverName, "type")));
+            dataSourceBuilder.username(SysProperties.getProperty(getServerProperty(serverName, "username")));
+            dataSourceBuilder.password(SysProperties.getProperty(getServerProperty(serverName, "password")));
+            dataSourceBuilder.jdbcUrl(SysProperties.getProperty(getServerProperty(serverName, "jdbcUrl")));
+            dataSourceBuilder.driverClassName(SysProperties.getProperty(getServerProperty(serverName, "driverClassName")));
             dbServer = new DBServer(dataSourceBuilder.build(), serverName);
             servers.put(serverName, dbServer);
         }

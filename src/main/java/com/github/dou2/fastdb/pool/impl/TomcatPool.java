@@ -5,6 +5,8 @@ import com.github.dou2.fastdb.pool.DataSourceBuilder;
 import javax.sql.DataSource;
 
 public class TomcatPool extends DataSourceBuilder {
+    public static final String TYPE = org.apache.tomcat.jdbc.pool.DataSource.class.getName();
+
     @Override
     public DataSource build() {
         org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
