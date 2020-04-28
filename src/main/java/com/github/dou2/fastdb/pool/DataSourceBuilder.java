@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class DataSourceBuilder {
-    private Map<String, String> properties = new HashMap<>();
+    private Map<String, String> properties = new HashMap<String, String>();
 
     public abstract DataSource build();
 

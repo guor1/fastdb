@@ -2,6 +2,7 @@ package com.github.dou2.fastdb;
 
 import com.github.dou2.fastdb.bean.BeanDescriptor;
 import com.github.dou2.fastdb.pool.DataSourceBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +14,9 @@ public class DBConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBConfig.class);
 
-    private static Map<String, DBServer> servers = new HashMap<>();
+    private static Map<String, DBServer> servers = new HashMap<String, DBServer>();
 
-    private static Map<String, BeanDescriptor<?>> beanMap = new HashMap<>();
+    private static Map<String, BeanDescriptor<?>> beanMap = new HashMap<String, BeanDescriptor<?>>();
 
     static {
         configure();
@@ -25,7 +26,7 @@ public class DBConfig {
 
     private static void configure() {
         String primaryServerName = SysProperties.getProperty("fastdb.default");
-        if (primaryServerName == null || primaryServerName.isEmpty()) {
+        if (StringUtils.isEmpty(primaryServerName)) {
             throw new FastdbException("The default DataSource has not been defined.");
         }
         primaryServer = getDBServerWithCreate(primaryServerName);
@@ -40,7 +41,7 @@ public class DBConfig {
     }
 
     public static DBServer getDBServer(String serverName) {
-        if (serverName == null || serverName.isEmpty()) {
+        if (StringUtils.isEmpty(serverName)) {
             return getPrimaryDBServer();
         }
         DBServer dbServer = servers.get(serverName);
@@ -51,7 +52,7 @@ public class DBConfig {
     }
 
     public static DBServer createServer(String serverName, DataSource dataSource) {
-        if (serverName == null || serverName.isEmpty()) {
+        if (StringUtils.isEmpty(serverName)) {
             throw new FastdbException("DBServer name must not null.");
         }
         if (servers.containsKey(serverName)) {
@@ -92,7 +93,7 @@ public class DBConfig {
             return beanDescriptor;
         }
         synchronized (DBConfig.class) {
-            beanDescriptor = new BeanDescriptor<>(klass);
+            beanDescriptor = new BeanDescriptor<T>(klass);
             beanMap.put(klass.getName(), beanDescriptor);
         }
         return beanDescriptor;
