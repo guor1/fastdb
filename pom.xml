@@ -10,7 +10,7 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-        <h2.version>1.4.187</h2.version>
+        <h2.version>2.1.210</h2.version>
         <HikariCP.version>3.4.3</HikariCP.version>
         <c3p0.version>0.9.5.5</c3p0.version>
         <tomcat-jdbc.version>9.0.34</tomcat-jdbc.version>
